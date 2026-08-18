@@ -546,7 +546,8 @@ a.card:hover { border-color: var(--accent); transform: translateY(-2px); }
 .frow { display: grid; grid-template-columns: 1fr 1fr; gap: 44px; align-items: center; margin-bottom: 52px; }
 .frow:last-child { margin-bottom: 0; }
 .frow h3 { font-size: 19px; font-weight: 600; letter-spacing: -0.01em; margin-bottom: 8px; }
-.frow p { font-size: 15px; color: var(--muted); line-height: 1.75; }
+.frow p { font-size: 15px; color: var(--muted); line-height: 1.75; margin-bottom: 16px; }
+.frow p:last-child { margin-bottom: 0; }
 .frow.flip .frow-text { order: 2; }
 .frow.flip .figure { order: 1; }
 
