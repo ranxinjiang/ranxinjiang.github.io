@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Streaming Finance Data Pipeline — Ran Xin Jiang</title>
+<meta name="description" content="A near real-time AWS pipeline streaming daily stock data for 66 companies through Lambda, Kinesis, Firehose, S3, Glue, and Athena.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a class="brand" href="index.html">Ran Xin Jiang<span>Project Management · Data Analytics</span></a>
+    <button class="nav-toggle" id="navToggle" aria-label="Menu">Menu</button>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="experience.html">Experience</a></li>
+      <li><a href="projects.html" class="active">Projects</a></li>
+      <li><a href="certifications.html">Certifications</a></li>
+      <li><a href="Ran_Xin_Jiang_Resume.pdf" target="_blank" rel="noopener">Résumé ↗</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="case-head">
+  <div class="wrap">
+    <a class="case-back" href="projects.html">← Back to Projects</a>
+    <p class="kicker">Cloud &amp; Data Engineering</p>
+    <h1>Streaming Finance Data Pipeline</h1>
+    <p class="case-meta">Graduate Project · Big Data Technologies · Apr – May 2026</p>
+    <div class="dl-row">
+      <a class="btn btn-primary" href="https://github.com/ranxinjiang/AWS-Streaming-Finance-Pipeline" target="_blank" rel="noopener">View the Code ↗</a>
+    </div>
+    <p class="dl-note">The Lambda producer, Athena query, and analysis notebook are on GitHub.</p>
+  </div>
+</header>
+
+<div class="case-nav">
+  <div class="wrap">
+    <ul>
+      <li><a href="#overview">Overview</a></li>
+      <li><a href="#architecture">Architecture</a></li>
+      <li><a href="#pipeline">Pipeline</a></li>
+      <li><a href="#analysis">Analysis</a></li>
+      <li><a href="#reflection">Lessons</a></li>
+    </ul>
+  </div>
+</div>
+
+<section class="case-section" id="overview">
+  <div class="wrap">
+    <h2>Overview</h2>
+    <div class="overview-grid">
+      <div>
+        <h3 style="margin-top:0">The Problem</h3>
+        <p>Stock market data is generated continuously, but the usual way to analyze it is to download a file and work on it locally. That works once and then goes stale, and it stops working entirely once the data outgrows your laptop.</p>
+
+        <h3>The Goal</h3>
+        <p>Build a pipeline that takes in records as they arrive, stores them in the cloud, and makes them queryable with SQL — no nightly batch job, no database server to maintain.</p>
+
+        <h3>What I Built</h3>
+        <p>A Lambda function pulls daily prices for 66 companies from the Alpha Vantage API and streams each record into Kinesis. Firehose delivers them into S3. Glue catalogs the schema so the raw files behave like a table. Athena queries them in place, and the analysis runs on that output.</p>
+        <p>The 66 tickers span technology, finance, retail, healthcare, energy, and industrials, so the dataset covers a range of sectors rather than a single slice of the market.</p>
+      </div>
+      <aside class="at-glance">
+        <h4>At a glance</h4>
+        <ul>
+          <li>6,600 Records Streamed</li>
+          <li>66 Companies Tracked</li>
+          <li>396 Query Result Rows</li>
+        </ul>
+        <h4 style="margin-top:20px">Built with</h4>
+        <ul>
+          <li>AWS Lambda</li>
+          <li>Kinesis Data Streams</li>
+          <li>Amazon Firehose</li>
+          <li>Amazon S3</li>
+          <li>AWS Glue</li>
+          <li>AWS Athena</li>
+          <li>Python &amp; Pandas</li>
+        </ul>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<section class="case-section" id="architecture">
+  <div class="wrap">
+    <h2>Architecture</h2>
+    <p class="lede">Seven services, each doing one job. Data moves left to right and never needs a human in the middle until the analysis step.</p>
+    <figure class="figure">
+      <svg viewBox="0 0 1080 300" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block" role="img" aria-label="Architecture diagram: Alpha Vantage API to Lambda to Kinesis Data Streams to Firehose to S3 to Glue Crawler to Athena to analysis notebook">
+
+        <rect x="8" y="60" width="132" height="76" rx="10" fill="#e5edfb" stroke="#1263d1" stroke-width="1"/>
+        <text x="74" y="90" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="500" fill="#0d4795">Alpha Vantage</text>
+        <text x="74" y="108" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="500" fill="#0d4795">API</text>
+        <text x="74" y="126" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#4a6a94">source</text>
+
+        <path d="M144 98 L176 98" stroke="#9fb4d0" stroke-width="1.5" marker-end="url(#ar)"/>
+
+        <rect x="180" y="60" width="132" height="76" rx="10" fill="#ffffff" stroke="#c9d6e8" stroke-width="1"/>
+        <text x="246" y="90" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="500" fill="#161a1f">Lambda</text>
+        <text x="246" y="108" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#64686f">fetch · transform</text>
+        <text x="246" y="124" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#64686f">put_record</text>
+
+        <path d="M316 98 L348 98" stroke="#9fb4d0" stroke-width="1.5" marker-end="url(#ar)"/>
+
+        <rect x="352" y="60" width="132" height="76" rx="10" fill="#ffffff" stroke="#c9d6e8" stroke-width="1"/>
+        <text x="418" y="90" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="500" fill="#161a1f">Kinesis</text>
+        <text x="418" y="108" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#64686f">Data Streams</text>
+        <text x="418" y="124" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#64686f">on-demand</text>
+
+        <path d="M488 98 L520 98" stroke="#9fb4d0" stroke-width="1.5" marker-end="url(#ar)"/>
+
+        <rect x="524" y="60" width="132" height="76" rx="10" fill="#ffffff" stroke="#c9d6e8" stroke-width="1"/>
+        <text x="590" y="90" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="500" fill="#161a1f">Firehose</text>
+        <text x="590" y="108" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#64686f">buffer · deliver</text>
+
+        <path d="M660 98 L692 98" stroke="#9fb4d0" stroke-width="1.5" marker-end="url(#ar)"/>
+
+        <rect x="696" y="60" width="132" height="76" rx="10" fill="#ffffff" stroke="#c9d6e8" stroke-width="1"/>
+        <text x="762" y="90" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="500" fill="#161a1f">Amazon S3</text>
+        <text x="762" y="108" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#64686f">partitioned by</text>
+        <text x="762" y="124" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#64686f">y / m / d / h</text>
+
+        <path d="M832 98 L864 98" stroke="#9fb4d0" stroke-width="1.5" marker-end="url(#ar)"/>
+
+        <rect x="868" y="60" width="132" height="76" rx="10" fill="#ffffff" stroke="#c9d6e8" stroke-width="1"/>
+        <text x="934" y="90" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="500" fill="#161a1f">AWS Glue</text>
+        <text x="934" y="108" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#64686f">crawl · catalog</text>
+
+        <path d="M934 140 L934 176" stroke="#9fb4d0" stroke-width="1.5" marker-end="url(#ar)"/>
+
+        <rect x="868" y="180" width="132" height="76" rx="10" fill="#ffffff" stroke="#c9d6e8" stroke-width="1"/>
+        <text x="934" y="210" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="500" fill="#161a1f">Athena</text>
+        <text x="934" y="228" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#64686f">SQL over S3</text>
+
+        <path d="M864 218 L700 218" stroke="#9fb4d0" stroke-width="1.5" marker-end="url(#ar)"/>
+
+        <rect x="524" y="180" width="172" height="76" rx="10" fill="#e5edfb" stroke="#1263d1" stroke-width="1"/>
+        <text x="610" y="210" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="500" fill="#0d4795">Analysis Notebook</text>
+        <text x="610" y="228" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#4a6a94">Pandas · Matplotlib</text>
+
+        <defs>
+          <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="#9fb4d0"/>
+          </marker>
+        </defs>
+      </svg>
+      <figcaption>End-to-end flow from API request to analysis output.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="case-section" id="pipeline">
+  <div class="wrap">
+    <h2>Building the Pipeline</h2>
+    <p class="lede">Each stage had a problem worth solving. The interesting parts weren't wiring the services together — they were the rate limits, the partitioning, and the schema.</p>
+
+    <div class="frow">
+      <div class="frow-text">
+        <h3>The Producer</h3>
+        <p>A Lambda function loops through the 66 tickers, requests the daily time series for each, and reshapes every day into a flat record: company name, timestamp, open price, close price, and the difference between them.</p>
+        <p>Alpha Vantage rate-limits aggressively on the free tier, so a naive loop fails partway through and leaves gaps. The function retries up to five times per company with a 15-second pause between attempts, and tracks which companies were skipped rather than failing silently. The final run returned an empty skip list — all 66 companies made it.</p>
+        <p>Records are written to Kinesis one at a time with <code>put_record</code>, partitioned by ticker so each company's records stay ordered, with a 50-millisecond pause between calls to stay inside the stream's throughput.</p>
+      </div>
+      <figure class="figure">
+        <img src="projects/aws-pipeline/lambda-execution.png" alt="AWS Lambda console showing a successful execution streaming 6,600 records with no skipped companies">
+        <figcaption>Execution result: 6,600 records streamed, zero companies skipped.</figcaption>
+      </figure>
+    </div>
+
+    <div class="frow flip">
+      <div class="frow-text">
+        <h3>The Stream</h3>
+        <p>The Kinesis stream runs in on-demand capacity mode, so throughput scales with the load instead of requiring shards to be provisioned up front. Retention is set to one day — long enough to replay if delivery fails, short enough not to pay for storage the pipeline doesn't need.</p>
+        <p>Watching the metrics during a run is how you confirm the stream is actually keeping up: iterator age staying near zero means the consumer isn't falling behind the producer.</p>
+      </div>
+      <figure class="figure">
+        <img src="projects/aws-pipeline/kinesis-monitoring.png" alt="Kinesis Data Streams monitoring dashboard showing GetRecords throughput, latency, and iterator age">
+        <figcaption>Stream metrics during ingestion — throughput, latency, and iterator age.</figcaption>
+      </figure>
+    </div>
+
+    <div class="frow">
+      <div class="frow-text">
+        <h3>Delivery to S3</h3>
+        <p>Firehose buffers incoming records and writes them out to S3 in batches, organized into a folder structure by year, month, day, and hour.</p>
+        <p>That partitioning is what keeps querying cheap later. Athena bills on data scanned, so a query that can narrow to a few prefixes reads far less than one forced to scan the whole bucket — the difference between megabytes and gigabytes as the dataset grows.</p>
+      </div>
+      <figure class="figure">
+        <img src="projects/aws-pipeline/s3-partitioned-output.png" alt="S3 bucket showing Firehose output files organized into date-based partition folders">
+        <figcaption>Firehose output landing in date-partitioned S3 prefixes.</figcaption>
+      </figure>
+    </div>
+
+    <div class="frow flip">
+      <div class="frow-text">
+        <h3>Catalog and Query</h3>
+        <p>A Glue crawler infers the schema from the JSON landing in S3 and registers it in the Data Catalog, which is what makes the raw files addressable as a table. From there Athena queries them directly — no load step, no warehouse to maintain.</p>
+        <p>The analysis query computes average monthly percentage change per company, grouping by ticker and the year-month slice of the timestamp. It returned 396 rows in 698 milliseconds while scanning 1.27 MB — a useful demonstration of why the partitioning mattered.</p>
+      </div>
+      <figure class="figure">
+        <img src="projects/aws-pipeline/athena-query.png" alt="Athena query editor showing the average monthly percentage change query and its results">
+        <figcaption>The Athena query and its 396-row result set.</figcaption>
+      </figure>
+    </div>
+
+  </div>
+</section>
+
+<section class="case-section" id="analysis">
+  <div class="wrap">
+    <h2>What the Data Showed</h2>
+    <p class="lede">The Athena results exported to CSV and fed a short analysis in Pandas and Matplotlib. Two questions, two charts.</p>
+
+    <div class="frow">
+      <div class="frow-text">
+        <h3>Which companies gained most on an average day?</h3>
+        <p>Ranking all 66 companies by average daily percentage change — the move from open to close — put <strong>INTC, AMD, and CSCO</strong> at the top, with technology names appearing repeatedly in the top 15. Only the top 15 are charted; plotting all 66 made the comparison unreadable.</p>
+        <p><strong>Worth being precise about what this measures.</strong> Averaging a signed daily change lets gains and losses cancel, so this is mean daily drift, not volatility — a company that swings wildly in both directions would land near zero here. The honest reading is that these names trended upward most consistently across the period, not that they moved around most. Measuring volatility would mean swapping the average for a standard deviation or an absolute change, which is the first thing I'd run next.</p>
+      </div>
+      <figure class="figure">
+        <img src="projects/aws-pipeline/top-15-companies.png" alt="Bar chart ranking the top 15 companies by average daily percentage change">
+        <figcaption>Top 15 companies by average daily percentage change.</figcaption>
+      </figure>
+    </div>
+
+    <div class="frow flip">
+      <div class="frow-text">
+        <h3>Did that hold steady over time?</h3>
+        <p>No. Tracking the top 5 companies month by month showed the ranking isn't fixed — <strong>INTC and AMD</strong> varied noticeably between months while others held closer to flat.</p>
+        <p>That matters for how the first chart should be read: a single average across the whole period flattens the months that produced it. A company can top the ranking on the strength of two good months and look unremarkable the rest of the time.</p>
+      </div>
+      <figure class="figure">
+        <img src="projects/aws-pipeline/monthly-trends.png" alt="Line chart showing monthly average percentage change trends for the top 5 companies">
+        <figcaption>Monthly trends for the top 5 companies.</figcaption>
+      </figure>
+    </div>
+
+  </div>
+</section>
+
+<section class="case-section" id="reflection">
+  <div class="wrap">
+    <h2>Lessons &amp; Next Steps</h2>
+    <p class="lede">The pipeline works end to end. Building it surfaced four things worth carrying into the next one.</p>
+    <ul class="tl-bullets" style="max-width:700px">
+      <li><strong>The metric answers a narrower question than it first appears to.</strong> Average signed daily change measures drift, not movement. Choosing it made the ranking easy to compute but meant the headline result needed careful wording — a good reminder to check what a metric actually captures before naming the chart after it.</li>
+      <li><strong>The handoff from Athena to the notebook is manual.</strong> Query results were exported to CSV and uploaded into Colab by hand, which means reproducing the charts requires someone to run the query and export it first. Reading directly from S3, or querying Athena from the notebook, would close that gap.</li>
+      <li>Installing the <code>requests</code> library at runtime inside the Lambda works but is slow and fragile. A Lambda layer or a packaged deployment would be the right approach.</li>
+      <li>The API key belongs in environment variables or Secrets Manager, not in the function body.</li>
+      <li>"Near real-time" is the honest description. The data source publishes daily bars, so the pipeline streams historical records as they're fetched rather than reacting to live market movement. The architecture would support genuine real-time data unchanged — the constraint is the source, not the design.</li>
+    </ul>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer-grid">
+      <div>
+        <p class="name">Ran Xin Jiang</p>
+        <p>Always happy to connect — reach out anytime.</p>
+        <p style="margin-top:14px"><a class="mail" href="mailto:ranxinj@gmail.com">ranxinj@gmail.com</a></p>
+      </div>
+      <div>
+        <h4>Pages</h4>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="about.html">About</a></li>
+          <li><a href="experience.html">Experience</a></li>
+          <li><a href="projects.html">Projects</a></li>
+          <li><a href="certifications.html">Certifications</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Elsewhere</h4>
+        <ul>
+          <li><a href="https://www.linkedin.com/in/ranxin-jiang/" target="_blank" rel="noopener">LinkedIn ↗</a></li>
+          <li><a href="https://github.com/ranxinjiang" target="_blank" rel="noopener">GitHub ↗</a></li>
+          <li><a href="Ran_Xin_Jiang_Resume.pdf" target="_blank" rel="noopener">Résumé ↗</a></li>
+        </ul>
+      </div>
+    </div>
+    <p class="copyright">© 2026 Ran Xin Jiang · Built with HTML, CSS &amp; JavaScript on GitHub Pages</p>
+  </div>
+</footer>
+
+<script>
+  document.getElementById('navToggle').addEventListener('click', function () {
+    document.getElementById('navLinks').classList.toggle('open');
+  });
+</script>
+
+</body>
+</html>
