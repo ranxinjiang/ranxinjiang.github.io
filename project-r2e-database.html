@@ -34,7 +34,7 @@
     <h1>R2E Tenant Management Database</h1>
     <p class="case-meta">Graduate Project · Database Management · Nov – Dec 2025</p>
     <div class="dl-row">
-      <a class="btn btn-primary" href="files/r2e-tenant-management.accdb" download>Download Database (.accdb) ↓</a>
+      <a class="btn btn-primary" href="projects/r2e/r2e-tenant-management.accdb" download>Download Database (.accdb) ↓</a>
     </div>
     <p class="dl-note">Requires Microsoft Access (Windows). Access isn't available on macOS — the walkthrough below covers everything the file contains.</p>
   </div>
@@ -93,7 +93,7 @@
     <h2>Schema</h2>
     <p class="lede">The entity relationship diagram encodes the constraints above — one tenant per apartment, one employee per service request, many apartments per property.</p>
     <figure class="figure">
-      <img src="img/r2e/erd.png" alt="Entity relationship diagram showing buildings, apartments, tenants, employees, and service requests">
+      <img src="projects/r2e/erd.png" alt="Entity relationship diagram showing buildings, apartments, tenants, employees, and service requests">
       <figcaption>Entity relationship diagram for the R2E tenant management database.</figcaption>
     </figure>
   </div>
@@ -110,7 +110,7 @@
         <p>The central navigation interface. It provides structured access to data entry forms and reporting modules, letting users manage tenant records, service requests, and employee information without hunting through raw tables. Organizing workflows into clear menu paths improves usability and reduces operational confusion.</p>
       </div>
       <figure class="figure">
-        <img src="img/r2e/switchboard.png" alt="Switchboard form providing navigation to data entry and reporting modules">
+        <img src="projects/r2e/switchboard.png" alt="Switchboard form providing navigation to data entry and reporting modules">
       </figure>
     </div>
 
@@ -120,7 +120,7 @@
         <p>Captures maintenance requests submitted for individual units, including tenant details, issue type, and assigned employee. This structured entry process lets management track work orders, monitor completion timelines, and maintain accountability across maintenance operations.</p>
       </div>
       <figure class="figure">
-        <img src="img/r2e/form-service-request.png" alt="Service request form capturing unit, issue type, and assigned employee">
+        <img src="projects/r2e/form-service-request.png" alt="Service request form capturing unit, issue type, and assigned employee">
       </figure>
     </div>
 
@@ -130,7 +130,7 @@
         <p>Collects the details needed for every tenant: full name, email address, phone number, monthly rent, household size, and lease start and end dates. Keeping this in one structured form is what makes the tenant directory and occupancy tracking possible downstream.</p>
       </div>
       <figure class="figure">
-        <img src="img/r2e/form-new-tenant.png" alt="New tenant form collecting contact details, rent, household size, and lease dates">
+        <img src="projects/r2e/form-new-tenant.png" alt="New tenant form collecting contact details, rent, household size, and lease dates">
       </figure>
     </div>
 
@@ -140,7 +140,7 @@
         <p>An onboarding form capturing full name, job position, phone number, email address, and home address. Job role is the field that matters most operationally — it's what allows service requests to be routed to someone qualified to handle them.</p>
       </div>
       <figure class="figure">
-        <img src="img/r2e/form-new-employee.png" alt="New employee form capturing name, job position, and contact details">
+        <img src="projects/r2e/form-new-employee.png" alt="New employee form capturing name, job position, and contact details">
       </figure>
     </div>
 
@@ -158,7 +158,7 @@
         <p>An alphabetical list of all tenants organized by building, with full name, unit number, phone number, email address, and lease start and end dates. Staff can verify occupancy at a glance and keep contact records current without opening the underlying tables.</p>
       </div>
       <figure class="figure">
-        <img src="img/r2e/report-tenant-directory.png" alt="Tenant directory report listing tenants alphabetically by building">
+        <img src="projects/r2e/report-tenant-directory.png" alt="Tenant directory report listing tenants alphabetically by building">
       </figure>
     </div>
 
@@ -168,7 +168,7 @@
         <p>An overview of maintenance activity across each property — the number and types of service requests submitted monthly, and the average time taken to complete them. Tracking completion speed and flagging properties with unusually high request volumes helps management spot problem buildings and judge when preventative maintenance or renovation is the better call.</p>
       </div>
       <figure class="figure">
-        <img src="img/r2e/report-property-maintenance.png" alt="Property maintenance report showing monthly request volume and average completion time per property">
+        <img src="projects/r2e/report-property-maintenance.png" alt="Property maintenance report showing monthly request volume and average completion time per property">
       </figure>
     </div>
 
@@ -178,7 +178,7 @@
         <p>A summary of each staff member's workload and productivity across the year: service requests completed, average time to resolve, types of tasks handled, and outstanding assignments. Surfacing completion rates and efficiency trends gives management a defensible basis for evaluating performance and making decisions on bonuses, raises, and staffing.</p>
       </div>
       <figure class="figure">
-        <img src="img/r2e/report-employee-performance.png" alt="Employee performance report showing requests completed and average resolution time per employee">
+        <img src="projects/r2e/report-employee-performance.png" alt="Employee performance report showing requests completed and average resolution time per employee">
       </figure>
     </div>
 
@@ -188,7 +188,7 @@
         <p>Real-time visibility into unresolved maintenance tasks across properties, showing submission date, service type, assigned employee, and current status. This is the report that catches requests slipping through the cracks.</p>
       </div>
       <figure class="figure">
-        <img src="img/r2e/report-open-service-requests.png" alt="Open service request report showing unresolved tasks with status and assigned employee">
+        <img src="projects/r2e/report-open-service-requests.png" alt="Open service request report showing unresolved tasks with status and assigned employee">
       </figure>
     </div>
 
@@ -206,7 +206,7 @@
         <p>Identifies every service request currently open and not yet completed, giving management real-time visibility into outstanding issues so urgent requests can be prioritized, workload distribution monitored, and nothing overlooked.</p>
       </div>
       <figure class="figure">
-        <img src="img/r2e/query-open-service-requests.png" alt="Open service requests query results">
+        <img src="projects/r2e/query-open-service-requests.png" alt="Open service requests query results">
       </figure>
     </div>
 
@@ -216,7 +216,7 @@
         <p>Retrieves completed requests alongside service type, assigned employee, apartment ID, and total completion time — the basis for evaluating employee responsiveness and whether work is being finished within a reasonable window.</p>
       </div>
       <figure class="figure">
-        <img src="img/r2e/query-completed-service-requests.png" alt="Completed service request details query results">
+        <img src="projects/r2e/query-completed-service-requests.png" alt="Completed service request details query results">
       </figure>
     </div>
 
@@ -226,7 +226,7 @@
         <p>Calculates average completion time for each service type. Knowing which categories of request consistently take longest is what lets management reallocate resources, adjust staffing, and identify where the process is bottlenecked rather than guessing.</p>
       </div>
       <figure class="figure">
-        <img src="img/r2e/query-average-completion.png" alt="Average service request completion time by service type">
+        <img src="projects/r2e/query-average-completion.png" alt="Average service request completion time by service type">
       </figure>
     </div>
 
@@ -236,7 +236,7 @@
         <p>Summarizes total service requests received per property each month and the average days required for completion, grouped by service type. This is what makes property-level comparison possible — detecting recurring maintenance patterns and supporting data-driven decisions on preventative maintenance and resource allocation.</p>
       </div>
       <figure class="figure">
-        <img src="img/r2e/query-property-maintenance.png" alt="Property maintenance and service request query grouped by property and service type">
+        <img src="projects/r2e/query-property-maintenance.png" alt="Property maintenance and service request query grouped by property and service type">
       </figure>
     </div>
 
