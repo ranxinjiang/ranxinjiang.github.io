@@ -76,11 +76,18 @@ a { color: inherit; }
 .hero { padding: 84px 0 60px; }
 .hero-split {
   display: grid;
-  grid-template-columns: 1fr 300px;
-  gap: 60px;
+  grid-template-columns: 1fr 340px;
+  gap: 56px;
   align-items: center;
 }
-.hero-photo { width: 100%; border-radius: var(--radius); display: block; }
+.hero-photo {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  object-position: 55% center;
+  border-radius: var(--radius);
+  display: block;
+}
 
 .eyebrow {
   font-size: 12px;
@@ -181,6 +188,74 @@ a.card:hover { border-color: var(--accent); transform: translateY(-2px); }
 .about-teaser p { color: var(--muted); font-size: 16.5px; line-height: 1.75; margin-bottom: 22px; }
 .about-teaser .btn { margin-top: 6px; }
 
+/* ---------- Interior page header ---------- */
+.page-head { padding: 72px 0 12px; }
+.page-head h1 {
+  font-size: clamp(38px, 5.5vw, 56px);
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  font-weight: 600;
+}
+
+/* ---------- About: identity block ---------- */
+.about-grid {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: 56px;
+  align-items: start;
+  padding: 32px 0 72px;
+  border-bottom: 1px solid var(--border);
+}
+.about-photo {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  object-position: 55% center;
+  border-radius: var(--radius);
+  display: block;
+}
+.id-name { font-size: 30px; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 2px; }
+.id-name em { font-style: normal; font-size: 17px; font-weight: 400; color: var(--muted); }
+.id-pron { font-size: 15px; color: var(--muted); margin-bottom: 28px; }
+
+.edu-item { margin-bottom: 22px; }
+.edu-item h3 { font-size: 16px; font-weight: 600; margin-bottom: 2px; }
+.edu-item p { font-size: 14.5px; color: var(--muted); }
+.edu-item .meta { font-size: 13.5px; color: var(--muted); }
+.edu-item .awards { display: inline-block; font-size: 12.5px; background: var(--accent-soft); color: var(--accent-dark); padding: 2px 9px; border-radius: 20px; margin-top: 6px; }
+
+.connect { margin-top: 30px; padding-top: 26px; border-top: 1px solid var(--border); }
+.connect h4 { font-size: 13px; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); font-weight: 500; margin-bottom: 12px; }
+.connect ul { list-style: none; display: flex; flex-wrap: wrap; gap: 10px; }
+.connect a {
+  display: inline-block;
+  font-size: 14.5px;
+  text-decoration: none;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 7px 15px;
+  transition: border-color .15s, color .15s;
+}
+.connect a:hover { border-color: var(--accent); color: var(--accent); }
+
+/* ---------- About: prose ---------- */
+.prose { max-width: 660px; }
+.prose p { font-size: 16.5px; color: var(--muted); line-height: 1.8; margin-bottom: 20px; }
+.prose p:last-child { margin-bottom: 0; }
+
+/* ---------- Skills ---------- */
+.skills-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 32px 48px; }
+.skill-group h3 { font-size: 15px; font-weight: 600; margin-bottom: 12px; }
+.skill-group ul { list-style: none; display: flex; flex-wrap: wrap; gap: 6px; }
+.skill-group li {
+  font-size: 13px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  padding: 4px 11px;
+  border-radius: 20px;
+}
+
 /* ---------- Footer ---------- */
 .footer { border-top: 1px solid var(--border); padding: 56px 0 40px; }
 .footer-grid { display: grid; grid-template-columns: 1.6fr 1fr 1fr; gap: 40px; }
@@ -214,10 +289,15 @@ a.card:hover { border-color: var(--accent); transform: translateY(-2px); }
 
   .hero { padding: 48px 0 40px; }
   .hero-split { grid-template-columns: 1fr; gap: 30px; }
-  .hero-photo { max-width: 240px; }
+  .hero-photo { max-width: 260px; }
 
   .stats { grid-template-columns: 1fr; gap: 24px; padding-bottom: 56px; }
   .card-grid, .focus-grid { grid-template-columns: 1fr; }
+
+  .page-head { padding: 44px 0 8px; }
+  .about-grid { grid-template-columns: 1fr; gap: 30px; padding: 24px 0 52px; }
+  .about-photo { max-width: 260px; }
+  .skills-grid { grid-template-columns: 1fr; gap: 26px; }
   .footer-grid { grid-template-columns: 1fr; gap: 32px; }
   .section { padding: 60px 0; }
 }
