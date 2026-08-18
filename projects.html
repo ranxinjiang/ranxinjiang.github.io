@@ -63,19 +63,19 @@
       <a class="proj-card" target="_blank" rel="noopener" href="project-aws-pipeline.html">
         <div>
           <div class="kicker">Cloud · Data engineering</div>
-          <h3>Real-Time Market Data Pipeline</h3>
-          <p class="meta">Individual Project · AWS · Mar – Apr 2026</p>
-          <p>A streaming pipeline built end to end on AWS: market data records produced into Kinesis, transformed in flight by Lambda, delivered to S3 through Firehose, and queried in place with Athena. The point was to build something that handles data arriving continuously rather than in a nightly batch.</p>
+          <h3>Streaming Finance Data Pipeline</h3>
+          <p class="meta">Graduate Project · Big Data Technologies · Apr – May 2026</p>
+          <p>A near real-time pipeline built end to end on AWS. A Lambda producer pulls daily prices for 66 companies from the Alpha Vantage API and streams each record into Kinesis; Firehose delivers them to partitioned S3 storage; Glue catalogs the schema; Athena queries the raw files in place. The point was infrastructure that handles data as it arrives rather than in a nightly batch.</p>
           <span class="proj-more">Read the case study →</span>
         </div>
         <div class="proj-side">
-          <div class="num">6,500+</div>
+          <div class="num">6,600</div>
           <div class="num-label">records streamed</div>
           <h4>Built with</h4>
           <ul>
-            <li>AWS Kinesis</li>
             <li>AWS Lambda</li>
-            <li>Firehose &amp; S3</li>
+            <li>Kinesis &amp; Firehose</li>
+            <li>S3 &amp; Glue</li>
             <li>Athena</li>
             <li>Python</li>
           </ul>
