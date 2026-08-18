@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Buffalo Flight Delay Analysis — Ran Xin Jiang</title>
+<meta name="description" content="Analysis of 5,509 flights from Buffalo Niagara International Airport — combining 30 days of raw JSON records to find where delays and cancellations concentrate.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a class="brand" href="index.html">Ran Xin Jiang<span>Project Management · Data Analytics</span></a>
+    <button class="nav-toggle" id="navToggle" aria-label="Menu">Menu</button>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="experience.html">Experience</a></li>
+      <li><a href="projects.html" class="active">Projects</a></li>
+      <li><a href="certifications.html">Certifications</a></li>
+      <li><a href="Ran_Xin_Jiang_Resume.pdf" target="_blank" rel="noopener">Résumé ↗</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="case-head">
+  <div class="wrap">
+    <a class="case-back" href="projects.html">← Back to Projects</a>
+    <p class="kicker">Data Analysis</p>
+    <h1>Buffalo Flight Delay Analysis</h1>
+    <p class="case-meta">Team Project · 4 Contributors · Oct – Dec 2025</p>
+    <div class="dl-row">
+      <a class="btn btn-primary" href="https://github.com/ranxinjiang/Flight-Data-Analysis-from-Buffalo-NY-Airport/blob/main/buffalo_flight_analysis.ipynb" target="_blank" rel="noopener">View the Notebook ↗</a>
+    </div>
+    <p class="dl-note">The full Jupyter notebook renders directly on GitHub — every chart, table, and line of code, in the order it was run.</p>
+  </div>
+</header>
+
+<div class="case-nav">
+  <div class="wrap">
+    <ul>
+      <li><a href="#overview">Overview</a></li>
+      <li><a href="#data">Data</a></li>
+      <li><a href="#findings">Findings</a></li>
+      <li><a href="#role">My Role</a></li>
+      <li><a href="#limitations">Limitations</a></li>
+    </ul>
+  </div>
+</div>
+
+<section class="case-section" id="overview">
+  <div class="wrap">
+    <h2>Overview</h2>
+    <div class="overview-grid">
+      <div>
+        <p>Airports and airlines juggle scheduling constraints, gate availability, weather, and flight volume — and when something slips, it isn't obvious where. Without structured analysis it's difficult to say which operational factors actually drive delays, or where they concentrate.</p>
+        <p>This project analyzed one month of flight activity at Buffalo Niagara International Airport to answer that: which airlines, destinations, gates, and days account for the delays, and whether the pattern points at anything fixable.</p>
+      </div>
+      <aside class="at-glance">
+        <h4>At a glance</h4>
+        <ul>
+          <li>5,509 Flights Analyzed</li>
+          <li>30 Days of Records</li>
+          <li>4 Visualizations</li>
+        </ul>
+        <h4 style="margin-top:20px">Built with</h4>
+        <ul>
+          <li>Python</li>
+          <li>Pandas</li>
+          <li>NumPy</li>
+          <li>Matplotlib</li>
+          <li>Jupyter</li>
+        </ul>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<section class="case-section" id="data">
+  <div class="wrap">
+    <h2>The Data</h2>
+    <p class="lede">Thirty JSON files — one per day of January 2025 — each holding a day of flight activity at BUF. Getting them into a single analyzable table was most of the work.</p>
+
+    <div class="frow">
+      <div class="frow-text">
+        <h3>What Each Record Held</h3>
+        <p>Scheduled and actual departure times, scheduled and actual arrival times, airline carrier, destination airport, aircraft information, gate assignment, and delay and cancellation indicators.</p>
+        <h3 style="margin-top:22px">Preparing It</h3>
+        <p>The 30 daily files were loaded and combined into one dataset, then cleaned — missing values handled, inconsistent formatting standardized, and scheduled versus actual times parsed into comparable formats. Delay metrics were calculated from those pairs, and a cancellation flag derived, producing the departure delay and arrival delay variables the rest of the analysis runs on.</p>
+      </div>
+      <div class="stats" style="display:block;border-bottom:none;padding:0">
+        <div class="stat" style="margin-bottom:26px">
+          <div class="n">5,509</div>
+          <div class="l">Flights in the combined dataset</div>
+        </div>
+        <div class="stat" style="margin-bottom:26px">
+          <div class="n">4,145</div>
+          <div class="l">Departed with usable delay data</div>
+        </div>
+        <div class="stat">
+          <div class="n">53</div>
+          <div class="l">Cancellations (0.96% of all flights)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="case-section" id="findings">
+  <div class="wrap">
+    <h2>Findings</h2>
+    <p class="lede">Delays at BUF are common but modest, and the interesting pattern isn't in the averages — it's in the gap between how flights leave and how they arrive.</p>
+
+    <div class="frow">
+      <div class="frow-text">
+        <h3>Flights Leave Late and Arrive Early</h3>
+        <p>The average departure ran <strong>27 minutes behind schedule</strong> (median 20 minutes), with the slowest tenth of flights leaving more than an hour late. Yet the average arrival came in <strong>11 minutes early</strong> — median 14 minutes early.</p>
+        <p>That gap is schedule padding. Carriers build slack into block times, so a late pushback doesn't necessarily mean a late landing. It also means departure delay overstates the passenger-facing problem: most of that lost time is recovered in the air.</p>
+        <p>By the DOT's 15-minute standard, <strong>45% of flights were delayed</strong> — 2,479 of 5,509.</p>
+      </div>
+      <figure class="figure">
+        <img src="projects/buffalo-flights/daily-cancellation-rate.png" alt="Line chart of daily cancellation rate across January 2025">
+        <figcaption>Daily cancellation rate across January 2025.</figcaption>
+      </figure>
+    </div>
+
+    <div class="frow flip">
+      <div class="frow-text">
+        <h3>Cancellations Are Rare and Clustered</h3>
+        <p>Only 53 flights cancelled across the month — under 1% of all activity. But they don't spread evenly: cancellations concentrate on a handful of dates rather than trickling through the month, which is the signature of weather events rather than chronic operational failure.</p>
+      </div>
+      <figure class="figure">
+        <img src="projects/buffalo-flights/gates-by-departure-delay.png" alt="Bar chart of the top 15 gates by average departure delay">
+        <figcaption>Top 15 gates by average departure delay.</figcaption>
+      </figure>
+    </div>
+
+    <div class="frow">
+      <div class="frow-text">
+        <h3>Some Gates and Destinations Carry More Delay</h3>
+        <p>Grouping by departure gate surfaced a spread wide enough to matter — certain gates consistently pushed back later than others, which points at ground operations and turnaround rather than anything in the air.</p>
+        <p>Destinations showed the same concentration: a small number of arrival airports accounted for a disproportionate share of arrival delay, and a separate small set drove most cancellations.</p>
+      </div>
+      <figure class="figure">
+        <img src="projects/buffalo-flights/destinations-by-arrival-delay.png" alt="Bar chart of the top 15 destinations by average arrival delay">
+        <figcaption>Top 15 destinations by average arrival delay.</figcaption>
+      </figure>
+    </div>
+
+    <div class="frow flip">
+      <div class="frow-text">
+        <h3>Cancellation Risk by Destination</h3>
+        <p>Ranking destinations by cancellation rate rather than raw count separates routes that are genuinely unreliable from routes that simply run more often. That distinction is what makes the finding actionable for scheduling decisions.</p>
+      </div>
+      <figure class="figure">
+        <img src="projects/buffalo-flights/destinations-by-cancellation-rate.png" alt="Bar chart of the top 15 destinations by cancellation rate">
+        <figcaption>Top 15 destinations by cancellation rate.</figcaption>
+      </figure>
+    </div>
+
+  </div>
+</section>
+
+<section class="case-section" id="role">
+  <div class="wrap">
+    <h2>My Role</h2>
+    <p class="lede">A four-person project. My contributions spanned documentation, data preparation, model planning, and analysis.</p>
+    <div class="overview-grid">
+      <div>
+        <h3>Data Preparation</h3>
+        <p>Prepared the raw flight data for analysis using Python and Pandas — combining the 30 daily JSON files into a single dataset, cleaning inconsistencies, handling missing and incomplete records, formatting scheduled and actual departure and arrival times, and creating the delay variables the analysis depends on.</p>
+
+        <h3>Model Planning</h3>
+        <p>Helped identify the key performance indicators relevant to delays and cancellations, and determined which variables to group and compare on — airline carrier, destination airport, gate assignment, and date of operation.</p>
+
+        <h3>Model Building &amp; Analysis</h3>
+        <p>Wrote Python code generating the delay-metric visualizations, built the grouped aggregations comparing airline and destination performance, and developed the graphs supporting the departure and arrival delay analysis.</p>
+
+        <h3>Executive Summary</h3>
+        <p>Wrote the executive summary communicating purpose, methodology, and key findings — translating the technical results into terms a non-technical stakeholder could act on.</p>
+      </div>
+      <aside class="at-glance">
+        <h4>Team</h4>
+        <ul>
+          <li>Anna Bold</li>
+          <li>Kossi Gamli</li>
+          <li>Ran Xin Jiang</li>
+          <li>Christina Pratas</li>
+        </ul>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<section class="case-section" id="limitations">
+  <div class="wrap">
+    <h2>Limitations</h2>
+    <p class="lede">What this analysis can't tell you, stated plainly — because knowing the boundaries of a dataset is part of reading it correctly.</p>
+    <ul class="tl-bullets" style="max-width:680px">
+      <li>The analysis covers a single month, so seasonal patterns can't be separated from January-specific weather.</li>
+      <li>External factors — weather data in particular — were not incorporated, which limits how far the cancellation clustering can be explained.</li>
+      <li>The dataset holds no information on airline staffing or aircraft maintenance, both plausible drivers of the delays observed.</li>
+    </ul>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer-grid">
+      <div>
+        <p class="name">Ran Xin Jiang</p>
+        <p>Always happy to connect — reach out anytime.</p>
+        <p style="margin-top:14px"><a class="mail" href="mailto:ranxinj@gmail.com">ranxinj@gmail.com</a></p>
+      </div>
+      <div>
+        <h4>Pages</h4>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="about.html">About</a></li>
+          <li><a href="experience.html">Experience</a></li>
+          <li><a href="projects.html">Projects</a></li>
+          <li><a href="certifications.html">Certifications</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Elsewhere</h4>
+        <ul>
+          <li><a href="https://www.linkedin.com/in/ranxin-jiang/" target="_blank" rel="noopener">LinkedIn ↗</a></li>
+          <li><a href="https://github.com/ranxinjiang" target="_blank" rel="noopener">GitHub ↗</a></li>
+          <li><a href="Ran_Xin_Jiang_Resume.pdf" target="_blank" rel="noopener">Résumé ↗</a></li>
+        </ul>
+      </div>
+    </div>
+    <p class="copyright">© 2026 Ran Xin Jiang · Built with HTML, CSS &amp; JavaScript on GitHub Pages</p>
+  </div>
+</footer>
+
+<script>
+  document.getElementById('navToggle').addEventListener('click', function () {
+    document.getElementById('navLinks').classList.toggle('open');
+  });
+</script>
+
+</body>
+</html>
