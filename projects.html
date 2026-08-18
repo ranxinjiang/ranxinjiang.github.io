@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Projects — Ran Xin Jiang</title>
+<meta name="description" content="Data warehousing, cloud streaming, and analytics projects by Ran Xin Jiang — a NYC restaurant inspection warehouse, an AWS real-time market data pipeline, and a Buffalo flight delay analysis.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a class="brand" href="index.html">Ran Xin Jiang<span>Project Management · Data Analytics</span></a>
+    <button class="nav-toggle" id="navToggle" aria-label="Menu">Menu</button>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="experience.html">Experience</a></li>
+      <li><a href="projects.html" class="active">Projects</a></li>
+      <li><a href="certifications.html">Certifications</a></li>
+      <li><a href="Ran_Xin_Jiang_Resume.pdf" target="_blank" rel="noopener">Résumé ↗</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="page-head">
+  <div class="wrap">
+    <h1>Projects</h1>
+  </div>
+</header>
+
+<section class="section">
+  <div class="wrap">
+    <p class="sub" style="margin-bottom:36px">Four projects across data warehousing, cloud streaming, exploratory analysis, and database design. Each one has a full write-up with the architecture, the queries, and what the data actually showed.</p>
+
+    <div class="proj-list">
+
+      <a class="proj-card" target="_blank" rel="noopener" href="project-nyc-warehouse.html">
+        <div>
+          <div class="kicker">Data warehousing · Analytics</div>
+          <h3>NYC Restaurant Complaint &amp; Inspection Warehouse</h3>
+          <p class="meta">Graduate Team Project · Data Warehousing &amp; Analytics · Feb – May 2026</p>
+          <p>Two NYC open datasets that nobody had joined: 311 restaurant complaints and Department of Health inspection results. I built a dimensional warehouse connecting them, then designed five KPIs to test whether complaint patterns can predict which restaurants fail inspection — and whether the city is inspecting the right places.</p>
+          <span class="proj-more">Read the case study →</span>
+        </div>
+        <div class="proj-side">
+          <div class="num">255K+</div>
+          <div class="num-label">records modeled</div>
+          <h4>Built with</h4>
+          <ul>
+            <li>dbt</li>
+            <li>BigQuery</li>
+            <li>SQL</li>
+            <li>Looker Studio</li>
+          </ul>
+        </div>
+      </a>
+
+      <a class="proj-card" target="_blank" rel="noopener" href="project-aws-pipeline.html">
+        <div>
+          <div class="kicker">Cloud · Data engineering</div>
+          <h3>Real-Time Market Data Pipeline</h3>
+          <p class="meta">Individual Project · AWS · Mar – Apr 2026</p>
+          <p>A streaming pipeline built end to end on AWS: market data records produced into Kinesis, transformed in flight by Lambda, delivered to S3 through Firehose, and queried in place with Athena. The point was to build something that handles data arriving continuously rather than in a nightly batch.</p>
+          <span class="proj-more">Read the case study →</span>
+        </div>
+        <div class="proj-side">
+          <div class="num">6,500+</div>
+          <div class="num-label">records streamed</div>
+          <h4>Built with</h4>
+          <ul>
+            <li>AWS Kinesis</li>
+            <li>AWS Lambda</li>
+            <li>Firehose &amp; S3</li>
+            <li>Athena</li>
+            <li>Python</li>
+          </ul>
+        </div>
+      </a>
+
+      <a class="proj-card" target="_blank" rel="noopener" href="project-buffalo-flights.html">
+        <div>
+          <div class="kicker">Data analysis</div>
+          <h3>Buffalo Flight Delay Analysis</h3>
+          <p class="meta">Team Project · 4 Contributors · Oct – Dec 2025</p>
+          <p>Thirty days of raw JSON flight records from Buffalo Niagara International Airport, combined into a single dataset and analyzed to find where delays concentrate — by airline, by destination, and by gate. I owned the data preparation, the grouped aggregations behind the findings, and the executive summary.</p>
+          <span class="proj-more">Read the case study →</span>
+        </div>
+        <div class="proj-side">
+          <div class="num">30 days</div>
+          <div class="num-label">of flight records</div>
+          <h4>Built with</h4>
+          <ul>
+            <li>Python</li>
+            <li>Pandas</li>
+            <li>NumPy</li>
+            <li>Matplotlib</li>
+            <li>Jupyter</li>
+          </ul>
+        </div>
+      </a>
+
+      <a class="proj-card" target="_blank" rel="noopener" href="project-r2e-database.html">
+        <div>
+          <div class="kicker">Database Design</div>
+          <h3>R2E Tenant Management Database</h3>
+          <p class="meta">Graduate Project · Database Management · Nov – Dec 2025</p>
+          <p>R2E, LLC is a fictional property management company created for a graduate database management course. The scenario: several residential buildings, their units and tenants, an in-house maintenance team, and a growing pile of Excel spreadsheets that had stopped being readable. The build: a relational Access database with four data-entry forms behind a central switchboard, four management reports, and four analytical queries covering open work orders, completion times, and employee workload.</p>
+          <span class="proj-more">Read the case study →</span>
+        </div>
+        <div class="proj-side">
+          <div class="num">12</div>
+          <div class="num-label">forms, reports &amp; queries</div>
+          <h4>Built with</h4>
+          <ul>
+            <li>Microsoft Access</li>
+            <li>SQL</li>
+            <li>Relational Design</li>
+            <li>Queries &amp; Macros</li>
+          </ul>
+        </div>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer-grid">
+      <div>
+        <p class="name">Ran Xin Jiang</p>
+        <p>Always happy to connect — reach out anytime.</p>
+        <p style="margin-top:14px"><a class="mail" href="mailto:ranxinj@gmail.com">ranxinj@gmail.com</a></p>
+      </div>
+      <div>
+        <h4>Pages</h4>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="about.html">About</a></li>
+          <li><a href="experience.html">Experience</a></li>
+          <li><a href="projects.html">Projects</a></li>
+          <li><a href="certifications.html">Certifications</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Elsewhere</h4>
+        <ul>
+          <li><a href="https://www.linkedin.com/in/ranxin-jiang/" target="_blank" rel="noopener">LinkedIn ↗</a></li>
+          <li><a href="https://github.com/ranxinjiang" target="_blank" rel="noopener">GitHub ↗</a></li>
+          <li><a href="Ran_Xin_Jiang_Resume.pdf" target="_blank" rel="noopener">Résumé ↗</a></li>
+        </ul>
+      </div>
+    </div>
+    <p class="copyright">© 2026 Ran Xin Jiang · Built with HTML, CSS &amp; JavaScript on GitHub Pages</p>
+  </div>
+</footer>
+
+<script>
+  document.getElementById('navToggle').addEventListener('click', function () {
+    document.getElementById('navLinks').classList.toggle('open');
+  });
+</script>
+
+</body>
+</html>
