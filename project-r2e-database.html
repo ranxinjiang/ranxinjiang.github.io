@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>R2E Tenant Management Database — Ran Xin Jiang</title>
+<meta name="description" content="A relational Microsoft Access database for a fictional property management company — schema design, data entry forms, management reports, and analytical queries.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a class="brand" href="index.html">Ran Xin Jiang<span>Project Management · Data Analytics</span></a>
+    <button class="nav-toggle" id="navToggle" aria-label="Menu">Menu</button>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="experience.html">Experience</a></li>
+      <li><a href="projects.html" class="active">Projects</a></li>
+      <li><a href="certifications.html">Certifications</a></li>
+      <li><a href="Ran_Xin_Jiang_Resume.pdf" target="_blank" rel="noopener">Résumé ↗</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="case-head">
+  <div class="wrap">
+    <a class="case-back" href="projects.html">← Back to Projects</a>
+    <p class="kicker">Database Design</p>
+    <h1>R2E Tenant Management Database</h1>
+    <p class="case-meta">Graduate Project · Database Management · Nov – Dec 2025</p>
+    <div class="dl-row">
+      <a class="btn btn-primary" href="files/r2e-tenant-management.accdb" download>Download Database (.accdb) ↓</a>
+    </div>
+    <p class="dl-note">Requires Microsoft Access (Windows). Access isn't available on macOS — the walkthrough below covers everything the file contains.</p>
+  </div>
+</header>
+
+<div class="case-nav">
+  <div class="wrap">
+    <ul>
+      <li><a href="#overview">Overview</a></li>
+      <li><a href="#schema">Schema</a></li>
+      <li><a href="#forms">Forms</a></li>
+      <li><a href="#reports">Reports</a></li>
+      <li><a href="#queries">Queries</a></li>
+    </ul>
+  </div>
+</div>
+
+<section class="case-section" id="overview">
+  <div class="wrap">
+    <h2>Overview</h2>
+    <div class="overview-grid">
+      <div>
+        <p>R2E, LLC is a fictional property management company created for a graduate database management course. It manages several residential buildings in Long Island City, Queens, and had spent five years tracking properties, tenants, service requests, and employees in Excel — workable at first, unreadable once the spreadsheets grew.</p>
+        <p>The database had to capture three sets of rules:</p>
+
+        <h3>Properties and Tenants:</h3>
+        <p>Each property contains many apartments, and each apartment leases to a single tenant. A household may have several occupants, but the lease sits under one name. Occupancy status matters since units can sit vacant, alongside tenant name, contact information, and household size.</p>
+
+        <h3>Service Requests:</h3>
+        <p>Repairs are handled in-house — broken appliances, leaks, plumbing. Each request records the apartment it came from, the type of work, and the employee assigned. An employee can hold many open requests, but every request resolves to exactly one employee, and each distinct service requires its own request.</p>
+
+        <h3>Employees:</h3>
+        <p>Contact information, home addresses, and job roles, so requests route to the right person.</p>
+      </div>
+      <aside class="at-glance">
+        <h4>At a glance</h4>
+        <ul>
+          <li>4 data entry forms</li>
+          <li>4 management reports</li>
+          <li>4 analytical queries</li>
+        </ul>
+        <h4 style="margin-top:20px">Built with</h4>
+        <ul>
+          <li>Microsoft Access</li>
+          <li>SQL</li>
+          <li>Relational Design</li>
+          <li>Queries &amp; Macros</li>
+        </ul>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<section class="case-section" id="schema">
+  <div class="wrap">
+    <h2>Schema</h2>
+    <p class="lede">The entity relationship diagram encodes the constraints above — one tenant per apartment, one employee per service request, many apartments per property.</p>
+    <figure class="figure">
+      <img src="img/r2e/erd.png" alt="Entity relationship diagram showing buildings, apartments, tenants, employees, and service requests">
+      <figcaption>Entity relationship diagram for the R2E tenant management database.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="case-section" id="forms">
+  <div class="wrap">
+    <h2>Forms</h2>
+    <p class="lede">Data entry and navigation. Four forms handle everything staff need to put into the system, structured so information is captured consistently rather than typed into whichever spreadsheet column happened to be free.</p>
+
+    <div class="frow">
+      <div class="frow-text">
+        <h3>Switchboard</h3>
+        <p>The central navigation interface. It provides structured access to data entry forms and reporting modules, letting users manage tenant records, service requests, and employee information without hunting through raw tables. Organizing workflows into clear menu paths improves usability and reduces operational confusion.</p>
+      </div>
+      <figure class="figure">
+        <img src="img/r2e/switchboard.png" alt="Switchboard form providing navigation to data entry and reporting modules">
+      </figure>
+    </div>
+
+    <div class="frow flip">
+      <div class="frow-text">
+        <h3>Service Request Form</h3>
+        <p>Captures maintenance requests submitted for individual units, including tenant details, issue type, and assigned employee. This structured entry process lets management track work orders, monitor completion timelines, and maintain accountability across maintenance operations.</p>
+      </div>
+      <figure class="figure">
+        <img src="img/r2e/form-service-request.png" alt="Service request form capturing unit, issue type, and assigned employee">
+      </figure>
+    </div>
+
+    <div class="frow">
+      <div class="frow-text">
+        <h3>New Tenant Form</h3>
+        <p>Collects the details needed for every tenant: full name, email address, phone number, monthly rent, household size, and lease start and end dates. Keeping this in one structured form is what makes the tenant directory and occupancy tracking possible downstream.</p>
+      </div>
+      <figure class="figure">
+        <img src="img/r2e/form-new-tenant.png" alt="New tenant form collecting contact details, rent, household size, and lease dates">
+      </figure>
+    </div>
+
+    <div class="frow flip">
+      <div class="frow-text">
+        <h3>New Employee Form</h3>
+        <p>An onboarding form capturing full name, job position, phone number, email address, and home address. Job role is the field that matters most operationally — it's what allows service requests to be routed to someone qualified to handle them.</p>
+      </div>
+      <figure class="figure">
+        <img src="img/r2e/form-new-employee.png" alt="New employee form capturing name, job position, and contact details">
+      </figure>
+    </div>
+
+  </div>
+</section>
+
+<section class="case-section" id="reports">
+  <div class="wrap">
+    <h2>Reports</h2>
+    <p class="lede">Operational monitoring. Four reports turn the stored records into the views management actually needs — who lives where, what's broken, who's fixing it, and how long it's taking.</p>
+
+    <div class="frow">
+      <div class="frow-text">
+        <h3>Tenant Directory Report</h3>
+        <p>An alphabetical list of all tenants organized by building, with full name, unit number, phone number, email address, and lease start and end dates. Staff can verify occupancy at a glance and keep contact records current without opening the underlying tables.</p>
+      </div>
+      <figure class="figure">
+        <img src="img/r2e/report-tenant-directory.png" alt="Tenant directory report listing tenants alphabetically by building">
+      </figure>
+    </div>
+
+    <div class="frow flip">
+      <div class="frow-text">
+        <h3>Property Maintenance &amp; Service Request Report</h3>
+        <p>An overview of maintenance activity across each property — the number and types of service requests submitted monthly, and the average time taken to complete them. Tracking completion speed and flagging properties with unusually high request volumes helps management spot problem buildings and judge when preventative maintenance or renovation is the better call.</p>
+      </div>
+      <figure class="figure">
+        <img src="img/r2e/report-property-maintenance.png" alt="Property maintenance report showing monthly request volume and average completion time per property">
+      </figure>
+    </div>
+
+    <div class="frow">
+      <div class="frow-text">
+        <h3>Employee Performance Report</h3>
+        <p>A summary of each staff member's workload and productivity across the year: service requests completed, average time to resolve, types of tasks handled, and outstanding assignments. Surfacing completion rates and efficiency trends gives management a defensible basis for evaluating performance and making decisions on bonuses, raises, and staffing.</p>
+      </div>
+      <figure class="figure">
+        <img src="img/r2e/report-employee-performance.png" alt="Employee performance report showing requests completed and average resolution time per employee">
+      </figure>
+    </div>
+
+    <div class="frow flip">
+      <div class="frow-text">
+        <h3>Open Service Request Report</h3>
+        <p>Real-time visibility into unresolved maintenance tasks across properties, showing submission date, service type, assigned employee, and current status. This is the report that catches requests slipping through the cracks.</p>
+      </div>
+      <figure class="figure">
+        <img src="img/r2e/report-open-service-requests.png" alt="Open service request report showing unresolved tasks with status and assigned employee">
+      </figure>
+    </div>
+
+  </div>
+</section>
+
+<section class="case-section" id="queries">
+  <div class="wrap">
+    <h2>Queries</h2>
+    <p class="lede">The analytical layer underneath the reports. Each query answers one operational question, and together they cover the full lifecycle of a service request from submission to completion.</p>
+
+    <div class="frow">
+      <div class="frow-text">
+        <h3>Open Service Requests</h3>
+        <p>Identifies every service request currently open and not yet completed, giving management real-time visibility into outstanding issues so urgent requests can be prioritized, workload distribution monitored, and nothing overlooked.</p>
+      </div>
+      <figure class="figure">
+        <img src="img/r2e/query-open-service-requests.png" alt="Open service requests query results">
+      </figure>
+    </div>
+
+    <div class="frow flip">
+      <div class="frow-text">
+        <h3>Completed Service Request Details</h3>
+        <p>Retrieves completed requests alongside service type, assigned employee, apartment ID, and total completion time — the basis for evaluating employee responsiveness and whether work is being finished within a reasonable window.</p>
+      </div>
+      <figure class="figure">
+        <img src="img/r2e/query-completed-service-requests.png" alt="Completed service request details query results">
+      </figure>
+    </div>
+
+    <div class="frow">
+      <div class="frow-text">
+        <h3>Average Service Request Completion</h3>
+        <p>Calculates average completion time for each service type. Knowing which categories of request consistently take longest is what lets management reallocate resources, adjust staffing, and identify where the process is bottlenecked rather than guessing.</p>
+      </div>
+      <figure class="figure">
+        <img src="img/r2e/query-average-completion.png" alt="Average service request completion time by service type">
+      </figure>
+    </div>
+
+    <div class="frow flip">
+      <div class="frow-text">
+        <h3>Property Maintenance &amp; Service Requests</h3>
+        <p>Summarizes total service requests received per property each month and the average days required for completion, grouped by service type. This is what makes property-level comparison possible — detecting recurring maintenance patterns and supporting data-driven decisions on preventative maintenance and resource allocation.</p>
+      </div>
+      <figure class="figure">
+        <img src="img/r2e/query-property-maintenance.png" alt="Property maintenance and service request query grouped by property and service type">
+      </figure>
+    </div>
+
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer-grid">
+      <div>
+        <p class="name">Ran Xin Jiang</p>
+        <p>Always happy to connect — reach out anytime.</p>
+        <p style="margin-top:14px"><a class="mail" href="mailto:ranxinj@gmail.com">ranxinj@gmail.com</a></p>
+      </div>
+      <div>
+        <h4>Pages</h4>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="about.html">About</a></li>
+          <li><a href="experience.html">Experience</a></li>
+          <li><a href="projects.html">Projects</a></li>
+          <li><a href="certifications.html">Certifications</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Elsewhere</h4>
+        <ul>
+          <li><a href="https://www.linkedin.com/in/ranxin-jiang/" target="_blank" rel="noopener">LinkedIn ↗</a></li>
+          <li><a href="https://github.com/ranxinjiang" target="_blank" rel="noopener">GitHub ↗</a></li>
+          <li><a href="Ran_Xin_Jiang_Resume.pdf" target="_blank" rel="noopener">Résumé ↗</a></li>
+        </ul>
+      </div>
+    </div>
+    <p class="copyright">© 2026 Ran Xin Jiang · Built with HTML, CSS &amp; JavaScript on GitHub Pages</p>
+  </div>
+</footer>
+
+<script>
+  document.getElementById('navToggle').addEventListener('click', function () {
+    document.getElementById('navLinks').classList.toggle('open');
+  });
+</script>
+
+</body>
+</html>
