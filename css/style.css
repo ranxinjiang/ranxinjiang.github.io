@@ -551,6 +551,59 @@ a.card:hover { border-color: var(--accent); transform: translateY(-2px); }
 .frow.flip .frow-text { order: 2; }
 .frow.flip .figure { order: 1; }
 
+/* ---------- Code &amp; KPI blocks ---------- */
+pre {
+  background: #f5f7fb;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px 18px;
+  overflow-x: auto;
+  margin-bottom: 16px;
+}
+pre code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12.5px;
+  line-height: 1.65;
+  color: #2b3947;
+  white-space: pre;
+}
+p code, li code, td code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.9em;
+  background: var(--accent-soft);
+  color: var(--accent-dark);
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
+.kpi {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 26px;
+  margin-bottom: 20px;
+}
+.kpi:last-child { margin-bottom: 0; }
+.kpi-num { font-size: 11.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; }
+.kpi h3 { font-size: 19px; font-weight: 600; letter-spacing: -0.01em; margin-bottom: 8px; }
+.kpi .q { font-size: 15px; color: var(--muted); line-height: 1.7; margin-bottom: 18px; }
+
+.finding { background: var(--accent-soft); border-radius: 8px; padding: 16px 18px; }
+.finding h4 {
+  font-size: 11.5px;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  color: var(--accent-dark);
+  font-weight: 500;
+  margin-bottom: 7px;
+}
+.finding p { font-size: 14.5px; color: var(--accent-dark); line-height: 1.7; margin: 0 0 10px; }
+.finding p:last-child { margin-bottom: 0; }
+
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+.two-col h3 { font-size: 16px; font-weight: 600; margin-bottom: 8px; }
+.two-col p { font-size: 15px; color: var(--muted); line-height: 1.7; }
+
 /* ---------- Footer ---------- */
 .footer { border-top: 1px solid var(--border); padding: 56px 0 40px; }
 .footer-grid { display: grid; grid-template-columns: 1.6fr 1fr 1fr; gap: 40px; }
@@ -610,6 +663,9 @@ a.card:hover { border-color: var(--accent); transform: translateY(-2px); }
   .overview-grid { grid-template-columns: 1fr; gap: 30px; }
   .frow { grid-template-columns: 1fr; gap: 20px; margin-bottom: 38px; }
   .frow.flip .frow-text, .frow.flip .figure { order: 0; }
+  .two-col { grid-template-columns: 1fr; gap: 26px; }
+  .kpi { padding: 20px; }
+  pre code { font-size: 11.5px; }
 
   .footer-grid { grid-template-columns: 1fr; gap: 32px; }
   .section { padding: 60px 0; }
