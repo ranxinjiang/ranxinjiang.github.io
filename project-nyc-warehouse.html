@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NYC Restaurant Complaint &amp; Inspection Warehouse — Ran Xin Jiang</title>
+<meta name="description" content="A Kimball dimensional warehouse in BigQuery joining NYC 311 restaurant complaints to Department of Health inspection results, with five cross-source risk KPIs.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a class="brand" href="index.html">Ran Xin Jiang<span>Project Management · Data Analytics</span></a>
+    <button class="nav-toggle" id="navToggle" aria-label="Menu">Menu</button>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="experience.html">Experience</a></li>
+      <li><a href="projects.html" class="active">Projects</a></li>
+      <li><a href="certifications.html">Certifications</a></li>
+      <li><a href="Ran_Xin_Jiang_Resume.pdf" target="_blank" rel="noopener">Résumé ↗</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="case-head">
+  <div class="wrap">
+    <a class="case-back" href="projects.html">← Back to Projects</a>
+    <p class="kicker">Data Warehousing · Analytics</p>
+    <h1>NYC Restaurant Complaint &amp; Inspection Warehouse</h1>
+    <p class="case-meta">Graduate Team Project · Data Warehousing &amp; Analytics · Feb – May 2026</p>
+    <div class="dl-row">
+      <a class="btn btn-primary" href="https://github.com/ranxinjiang/NYC-Restaurant-Analytics-Warehouse" target="_blank" rel="noopener">View the Repository ↗</a>
+    </div>
+    <p class="dl-note">The five KPI queries, the dimensional model, and the pipeline lineage graph are on GitHub.</p>
+  </div>
+</header>
+
+<div class="case-nav">
+  <div class="wrap">
+    <ul>
+      <li><a href="#overview">Overview</a></li>
+      <li><a href="#model">Model</a></li>
+      <li><a href="#pipeline">Pipeline</a></li>
+      <li><a href="#kpis">KPIs</a></li>
+      <li><a href="#conclusions">Conclusions</a></li>
+    </ul>
+  </div>
+</div>
+
+<section class="case-section" id="overview">
+  <div class="wrap">
+    <h2>Overview</h2>
+    <div class="overview-grid">
+      <div>
+        <h3 style="margin-top:0">The Problem</h3>
+        <p>New York City collects two large streams of information about restaurants and keeps them apart. Residents file 311 complaints about food safety, sanitation, and vermin. Health inspectors separately produce scores and letter grades. Neither dataset knows about the other, so a natural question goes unanswered: do complaints predict what inspectors find, and is the city inspecting the places people are complaining about?</p>
+
+        <h3>The Approach</h3>
+        <p>Build a dimensional warehouse that joins both sources on shared dimensions, then define KPIs that only work <em>because</em> the sources are joined — measures that can't be computed from either dataset alone.</p>
+
+        <h3>The Questions</h3>
+        <p>How do customer-reported complaints relate to official inspection scores across boroughs? And how do location and cuisine type influence both complaint volume and inspection performance?</p>
+
+        <h3>The Stakeholders</h3>
+        <p>The Department of Health and Mental Hygiene, city health inspectors, the Department of Consumer and Worker Protection, and restaurant owners — anyone deciding where limited inspection capacity should go.</p>
+      </div>
+      <aside class="at-glance">
+        <h4>At a glance</h4>
+        <ul>
+          <li>2 Data Marts</li>
+          <li>2 Fact Tables</li>
+          <li>10 Dimensions</li>
+          <li>5 Cross-Source KPIs</li>
+        </ul>
+        <h4 style="margin-top:20px">Built with</h4>
+        <ul>
+          <li>Google BigQuery</li>
+          <li>dbt</li>
+          <li>Cloud Run</li>
+          <li>Python</li>
+          <li>SQL</li>
+          <li>Looker Studio</li>
+        </ul>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<section class="case-section" id="model">
+  <div class="wrap">
+    <h2>The Dimensional Model</h2>
+    <p class="lede">A Kimball star schema with two marts — one for inspections, one for 311 complaints — sharing conformed dimensions. The sharing is the point: it's what makes cross-source analysis possible at all.</p>
+
+    <figure class="figure" style="margin-bottom:34px">
+      <img src="projects/nyc-warehouse/dimensional-model.png" alt="Dimensional model showing fact_inspection and fact_service_request with shared dim_date and dim_location">
+      <figcaption>Final dimensional model — two fact tables, ten dimensions, conformed on date and location.</figcaption>
+    </figure>
+
+    <div class="two-col" style="margin-bottom:34px">
+      <div>
+        <h3>Grain</h3>
+        <p><code>fact_inspection</code> — one inspection result, at violation level. Joins to restaurant, inspection type, violation, results, date, and location.</p>
+        <p style="margin-top:12px"><code>fact_service_request</code> — one 311 service request. Joins to date, location, agency, problem, status, and location type.</p>
+      </div>
+      <div>
+        <h3>Conformed Dimensions</h3>
+        <p><code>dim_date</code> and <code>dim_location</code> are shared by both fact tables. Without them the two marts would sit side by side and answer nothing jointly. With them, complaint activity and inspection outcomes can be compared by borough, ZIP code, season, and year.</p>
+      </div>
+    </div>
+
+    <h3 style="font-size:19px;font-weight:600;margin-bottom:10px">The BBL Problem</h3>
+    <p style="font-size:15px;color:var(--muted);line-height:1.75;max-width:760px;margin-bottom:12px">The obvious way to join these datasets is BBL — Borough, Block, Lot — the city's property identifier. It gives an exact, building-level match, which is what you want when asking whether <em>this specific restaurant</em> generated complaints before failing an inspection.</p>
+    <p style="font-size:15px;color:var(--muted);line-height:1.75;max-width:760px">In practice BBL was neither complete nor consistently formatted across both sources. Rather than accept the coverage loss, the model was designed to work at two levels: KPIs that need precision still join on BBL, while others fall back to the conformed location and date dimensions. That means partial BBL coverage degrades the analysis instead of breaking it — the central design decision in the whole model.</p>
+  </div>
+</section>
+
+<section class="case-section" id="pipeline">
+  <div class="wrap">
+    <h2>The Pipeline</h2>
+    <p class="lede">A three-stage ELT — raw, staging, marts — with extraction running on Cloud Run and transformation in dbt.</p>
+
+    <figure class="figure" style="margin-bottom:30px">
+      <svg viewBox="0 0 1080 132" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block" role="img" aria-label="Pipeline diagram: NYC Open Data via Socrata API to Cloud Run to BigQuery raw to dbt staging to dbt marts to Looker Studio">
+        <rect x="6" y="30" width="150" height="72" rx="10" fill="#e5edfb" stroke="#1263d1" stroke-width="1"/>
+        <text x="81" y="58" text-anchor="middle" font-family="Inter, sans-serif" font-size="12.5" font-weight="500" fill="#0d4795">NYC Open Data</text>
+        <text x="81" y="76" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#4a6a94">Socrata API</text>
+
+        <path d="M160 66 L188 66" stroke="#9fb4d0" stroke-width="1.5" marker-end="url(#a2)"/>
+
+        <rect x="192" y="30" width="150" height="72" rx="10" fill="#ffffff" stroke="#c9d6e8" stroke-width="1"/>
+        <text x="267" y="58" text-anchor="middle" font-family="Inter, sans-serif" font-size="12.5" font-weight="500" fill="#161a1f">Cloud Run</text>
+        <text x="267" y="76" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#64686f">Python · paginated</text>
+
+        <path d="M346 66 L374 66" stroke="#9fb4d0" stroke-width="1.5" marker-end="url(#a2)"/>
+
+        <rect x="378" y="30" width="150" height="72" rx="10" fill="#ffffff" stroke="#c9d6e8" stroke-width="1"/>
+        <text x="453" y="58" text-anchor="middle" font-family="Inter, sans-serif" font-size="12.5" font-weight="500" fill="#161a1f">BigQuery — Raw</text>
+        <text x="453" y="76" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#64686f">2 source tables</text>
+
+        <path d="M532 66 L560 66" stroke="#9fb4d0" stroke-width="1.5" marker-end="url(#a2)"/>
+
+        <rect x="564" y="30" width="150" height="72" rx="10" fill="#ffffff" stroke="#c9d6e8" stroke-width="1"/>
+        <text x="639" y="58" text-anchor="middle" font-family="Inter, sans-serif" font-size="12.5" font-weight="500" fill="#161a1f">dbt — Staging</text>
+        <text x="639" y="76" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#64686f">clean · standardize</text>
+
+        <path d="M718 66 L746 66" stroke="#9fb4d0" stroke-width="1.5" marker-end="url(#a2)"/>
+
+        <rect x="750" y="30" width="150" height="72" rx="10" fill="#ffffff" stroke="#c9d6e8" stroke-width="1"/>
+        <text x="825" y="58" text-anchor="middle" font-family="Inter, sans-serif" font-size="12.5" font-weight="500" fill="#161a1f">dbt — Marts</text>
+        <text x="825" y="76" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#64686f">2 facts · 10 dims</text>
+
+        <path d="M904 66 L932 66" stroke="#9fb4d0" stroke-width="1.5" marker-end="url(#a2)"/>
+
+        <rect x="936" y="30" width="138" height="72" rx="10" fill="#e5edfb" stroke="#1263d1" stroke-width="1"/>
+        <text x="1005" y="58" text-anchor="middle" font-family="Inter, sans-serif" font-size="12.5" font-weight="500" fill="#0d4795">Looker Studio</text>
+        <text x="1005" y="76" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#4a6a94">KPI dashboard</text>
+
+        <defs>
+          <marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="#9fb4d0"/>
+          </marker>
+        </defs>
+      </svg>
+      <figcaption>End-to-end architecture, from public API to dashboard.</figcaption>
+    </figure>
+
+    <div class="two-col" style="margin-bottom:30px">
+      <div>
+        <h3>Extract &amp; Load</h3>
+        <p>Python functions on Cloud Run pull from the Socrata API, paginating in 5,000-row chunks with an app token held in an environment variable. The 311 feed is filtered at extraction to rows where <code>location_type</code> contains "Restaurant" — filtering at the source rather than after loading keeps the raw tables to a workable size.</p>
+      </div>
+      <div>
+        <h3>Transform</h3>
+        <p>dbt cleans and standardizes into a staging layer: borough and cuisine names normalized, date fields converted to consistent timestamps, duplicate and incomplete records removed. Marts then build the star schema, with dimension models upstream of fact models.</p>
+      </div>
+    </div>
+
+    <figure class="figure">
+      <img src="projects/nyc-warehouse/dbt-dag-lineage.png" alt="dbt lineage graph showing two sources flowing through staging models into ten dimensions and two fact tables">
+      <figcaption>dbt lineage — two sources, two staging models, ten dimensions, two facts.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="case-section" id="kpis">
+  <div class="wrap">
+    <h2>Five Cross-Source KPIs</h2>
+    <p class="lede">Each of these requires both datasets. None can be computed from complaints or inspections alone — which is the argument for building the warehouse in the first place.</p>
+
+    <div class="kpi">
+      <p class="kpi-num">KPI 01 · Lead finding</p>
+      <h3>Inspection Targeting Effectiveness Index</h3>
+      <p class="q">Are inspectors actually going where the complaints are? The index averages three sub-metrics: what share of inspections happen in complaint-heavy areas, whether those areas get inspected at all, and whether inspection volume correlates with complaint volume.</p>
+      <pre><code>-- High-complaint BBLs = top 25% of complaint counts
+threshold AS (
+  SELECT APPROX_QUANTILES(complaint_count, 4)[OFFSET(3)] AS complaint_p75
+  FROM combined
+)
+...
+SELECT
+  borough,
+  -- METRIC 1: share of all inspections landing in complaint-heavy areas
+  SAFE_DIVIDE(SUM(inspection_count),
+              (SELECT SUM(inspection_count) FROM combined))
+    AS high_complaint_inspection_rate,
+
+  -- METRIC 2: do complaint-heavy areas get inspected at all?
+  SAFE_DIVIDE(COUNT(DISTINCT CASE WHEN inspection_count > 0 THEN bbl END),
+              COUNT(DISTINCT bbl))
+    AS complaint_coverage_ratio,
+
+  -- METRIC 3: does inspection activity rise with complaint activity?
+  CORR(complaint_count, inspection_count)
+    AS complaint_inspection_alignment_score,
+
+  -- FINAL: mean of the three
+  ( ... ) / 3 AS inspection_targeting_effectiveness_index
+FROM high_complaint_bbls
+GROUP BY borough</code></pre>
+      <div class="finding">
+        <h4>Finding</h4>
+        <p>The index lands between <strong>0.20 and 0.35 across all five boroughs</strong>, against an optimal value of 1.0. Manhattan is highest at 0.33; Staten Island lowest.</p>
+        <p>Inspection capacity is not being directed at the places generating the most complaints. The gap is widest in less densely populated areas, which suggests either slower response or thinner regulatory coverage where complaint volume is lower in absolute terms but still concentrated.</p>
+      </div>
+    </div>
+
+    <div class="kpi">
+      <p class="kpi-num">KPI 02</p>
+      <h3>Seasonal Complaint-Inspection Alignment</h3>
+      <p class="q">Do complaint spikes line up with worse inspection outcomes, and does that pattern move with the seasons?</p>
+      <pre><code>SELECT
+  sc.year, sc.season, sc.borough,
+  sc.seasonal_complaints,
+  si.seasonal_inspections,
+
+  -- Metric 1: complaints relative to inspections
+  ROUND(SAFE_DIVIDE(sc.seasonal_complaints,
+                    si.seasonal_inspections), 2)
+    AS complaint_to_inspection_ratio,
+
+  -- Metric 2: inspection severity weighted by complaint volume
+  ROUND(SAFE_DIVIDE((si.avg_inspection_score * sc.seasonal_complaints),
+                    sc.seasonal_complaints), 2)
+    AS complaint_weighted_inspection_score
+
+FROM seasonal_complaints sc
+LEFT JOIN seasonal_inspections si
+  ON sc.year = si.year
+ AND sc.season = si.season
+ AND sc.borough = si.borough
+WHERE sc.year >= 2022 AND sc.year &lt; 2026</code></pre>
+      <div class="finding">
+        <h4>Finding</h4>
+        <p>Complaint-to-inspection ratios peaked in <strong>2022, especially in spring</strong>, and are consistently lowest in winter. Summer and fall carry both higher complaint ratios and higher complaint-weighted inspection scores — warmer months are worse on both measures at once.</p>
+        <p><strong>Queens and Brooklyn</strong> hold the highest complaint-weighted scores across seasons. Worth noting that in the NYC grading system a higher score means <em>worse</em> sanitary conditions.</p>
+      </div>
+    </div>
+
+    <div class="kpi">
+      <p class="kpi-num">KPI 03</p>
+      <h3>Cuisine Complaint Risk Index</h3>
+      <p class="q">Which cuisine types combine high complaint activity with weak inspection performance? Complaints are tied to cuisine through the shared BBL field.</p>
+      <pre><code>SELECT
+  cuisine_type,
+  total_complaints,
+  total_inspections,
+  avg_inspection_score,
+
+  -- complaint frequency relative to inspection volume
+  SAFE_DIVIDE(total_complaints, total_inspections)
+    AS complaint_rate_per_cuisine_inspection,
+
+  -- FINAL: complaint rate over inspection performance
+  SAFE_DIVIDE(
+    SAFE_DIVIDE(total_complaints, total_inspections),
+    avg_inspection_score
+  ) AS cuisine_complaint_risk_index
+
+FROM combined
+WHERE total_inspections >= 10   -- drop thin cuisine categories
+ORDER BY cuisine_complaint_risk_index DESC</code></pre>
+      <div class="finding">
+        <h4>Finding</h4>
+        <p><strong>American cuisine tops the index at roughly 130</strong> — close to four times the next category. High complaint volume alongside higher violation penalty points.</p>
+        <p>The <code>WHERE total_inspections &gt;= 10</code> filter matters here: without it, cuisine types with a handful of inspections produce unstable ratios that dominate the ranking for no meaningful reason.</p>
+      </div>
+    </div>
+
+    <div class="kpi">
+      <p class="kpi-num">KPI 04</p>
+      <h3>Complaint Severity Inspection Impact</h3>
+      <p class="q">Do <em>severe</em> complaints predict worse inspections? The 311 data has no severity field, so severity was derived from keywords — food, sanitation, dirty, vermin, rodent — across the problem and problem-detail fields.</p>
+      <pre><code>-- No severity field exists in 311, so define it by keyword
+WHERE sr.bbl IS NOT NULL
+  AND d.year BETWEEN 2022 AND 2025
+  AND (
+    LOWER(p.problem) LIKE '%food%'
+    OR LOWER(p.problem) LIKE '%sanitation%'
+    OR LOWER(p.problem) LIKE '%dirty%'
+    OR LOWER(p.problem) LIKE '%vermin%'
+    OR LOWER(p.problem) LIKE '%rodent%'
+    OR LOWER(p.problem_detail) LIKE '%food%'
+    ...
+  )
+...
+-- FINAL: severity impact score
+SAFE_DIVIDE(
+  AVG(CASE WHEN severe_complaint_count > 0
+           THEN avg_inspection_score END),
+  SAFE_DIVIDE(
+    COUNT(DISTINCT CASE WHEN severe_complaint_count > 0 THEN bbl END),
+    COUNT(DISTINCT bbl))
+) AS severity_impact_score</code></pre>
+      <div class="finding">
+        <h4>Finding</h4>
+        <p>Months with higher severity impact scores were generally associated with worse inspection outcomes, with peaks in <strong>January, July, and December</strong>.</p>
+        <p>The honest caveat: severity here is a keyword proxy, not a field the city publishes. It's a defensible construction, but it's a construction — and a different keyword set would produce different numbers.</p>
+      </div>
+    </div>
+
+    <div class="kpi">
+      <p class="kpi-num">KPI 05</p>
+      <h3>Complaint Adjusted Inspection Risk</h3>
+      <p class="q">At the location level, do areas with more complaints per inspection also carry worse average inspection scores?</p>
+      <pre><code>SELECT
+  l.borough,
+  COUNT(DISTINCT c.location_key) AS total_locations,
+  SUM(c.total_complaints)        AS total_complaints,
+  SUM(c.total_inspections)       AS total_inspections,
+  ROUND(AVG(c.complaint_rate_per_inspection), 2)
+    AS avg_complaint_rate_per_inspection,
+  ROUND(AVG(c.avg_inspection_score), 2)
+    AS avg_inspection_score,
+
+  -- FINAL: complaint rate normalized by inspection score
+  ROUND(AVG(c.complaint_rate_per_inspection)
+        / NULLIF(AVG(c.avg_inspection_score), 0), 4)
+    AS complaint_adjusted_inspection_risk
+
+FROM combined c
+INNER JOIN dim_location l ON c.location_key = l.location_key
+GROUP BY l.borough
+ORDER BY complaint_adjusted_inspection_risk DESC</code></pre>
+      <div class="finding">
+        <h4>Finding</h4>
+        <p>Complaint density and poor inspection outcomes do move together at borough level. <strong>Manhattan recorded over 2,500 high-complaint BBLs and Brooklyn roughly 2,000</strong> — the two densest boroughs concentrate both public complaints and enforcement activity.</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section class="case-section" id="conclusions">
+  <div class="wrap">
+    <h2>Conclusions &amp; Next Steps</h2>
+    <p class="lede">Joining the two sources produced findings neither could support alone.</p>
+
+    <div class="two-col" style="margin-bottom:30px">
+      <div>
+        <h3>What the analysis supports</h3>
+        <p>Complaint data is a usable signal for inspection planning. Complaint activity and poor inspection outcomes align by cuisine, by borough, and by season — and current inspection targeting captures very little of that signal.</p>
+        <p style="margin-top:12px">For stakeholders planning 2026 inspections, the practical implication is that 311 volume should be an input to deployment decisions rather than a parallel record nobody consults.</p>
+      </div>
+      <div>
+        <h3>Where it falls short</h3>
+        <p>BBL coverage limited property-level matching, so much of the analysis runs at borough granularity — coarser than it should be for operational decisions. Complaint severity is a keyword proxy rather than a published field.</p>
+      </div>
+    </div>
+
+    <h3 style="font-size:19px;font-weight:600;margin-bottom:12px">Next steps</h3>
+    <ul class="tl-bullets" style="max-width:760px">
+      <li><strong>Narrow location analysis to ZIP code.</strong> Borough is too coarse to route an inspector. ZIP-level grouping would make the targeting index actionable rather than diagnostic.</li>
+      <li><strong>Measure the lag between severe complaints and poor inspection scores.</strong> The current analysis shows the two co-occur; it doesn't establish whether complaints <em>lead</em> inspections. That's the question that would turn this from a description into a prediction.</li>
+      <li><strong>Improve BBL coverage</strong> through address standardization or geocoding, which would restore property-level matching and sharpen every KPI that currently falls back to location.</li>
+    </ul>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer-grid">
+      <div>
+        <p class="name">Ran Xin Jiang</p>
+        <p>Always happy to connect — reach out anytime.</p>
+        <p style="margin-top:14px"><a class="mail" href="mailto:ranxinj@gmail.com">ranxinj@gmail.com</a></p>
+      </div>
+      <div>
+        <h4>Pages</h4>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="about.html">About</a></li>
+          <li><a href="experience.html">Experience</a></li>
+          <li><a href="projects.html">Projects</a></li>
+          <li><a href="certifications.html">Certifications</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Elsewhere</h4>
+        <ul>
+          <li><a href="https://www.linkedin.com/in/ranxin-jiang/" target="_blank" rel="noopener">LinkedIn ↗</a></li>
+          <li><a href="https://github.com/ranxinjiang" target="_blank" rel="noopener">GitHub ↗</a></li>
+          <li><a href="Ran_Xin_Jiang_Resume.pdf" target="_blank" rel="noopener">Résumé ↗</a></li>
+        </ul>
+      </div>
+    </div>
+    <p class="copyright">© 2026 Ran Xin Jiang · Built with HTML, CSS &amp; JavaScript on GitHub Pages</p>
+  </div>
+</footer>
+
+<script>
+  document.getElementById('navToggle').addEventListener('click', function () {
+    document.getElementById('navLinks').classList.toggle('open');
+  });
+</script>
+
+</body>
+</html>
