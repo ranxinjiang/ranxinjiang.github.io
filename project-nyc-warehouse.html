@@ -47,7 +47,7 @@
       <li><a href="#model">Model</a></li>
       <li><a href="#pipeline">Pipeline</a></li>
       <li><a href="#kpis">KPIs</a></li>
-      <li><a href="#conclusions">Conclusions</a></li>
+      <li><a href="#conclusion">Conclusion</a></li>
     </ul>
   </div>
 </div>
@@ -61,13 +61,34 @@
         <p>New York City collects two large streams of information about restaurants and keeps them apart. Residents file 311 complaints about food safety, sanitation, and vermin. Health inspectors separately produce scores and letter grades. Neither dataset knows about the other, so a natural question goes unanswered: do complaints predict what inspectors find, and is the city inspecting the places people are complaining about?</p>
 
         <h3>The Approach</h3>
-        <p>Build a dimensional warehouse that joins both sources on shared dimensions, then define KPIs that only work <em>because</em> the sources are joined — measures that can't be computed from either dataset alone.</p>
+        <p>Build a dimensional warehouse that joins both sources on shared dimensions, then define KPIs that only work <em>because</em> the sources are joined — measures that cannot be computed from either dataset alone.</p>
 
         <h3>The Questions</h3>
         <p>How do customer-reported complaints relate to official inspection scores across boroughs? And how do location and cuisine type influence both complaint volume and inspection performance?</p>
 
         <h3>The Stakeholders</h3>
         <p>The Department of Health and Mental Hygiene, city health inspectors, the Department of Consumer and Worker Protection, and restaurant owners — anyone deciding where limited inspection capacity should go.</p>
+
+        <h3>The Data</h3>
+        <p style="margin-bottom:14px">Two public datasets from NYC Open Data, pulled through the Socrata API.</p>
+        <ul class="src-list">
+          <li>
+            <div class="src-head">
+              <a href="https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2010-to-Present/erm2-nwe9" target="_blank" rel="noopener">NYC 311 Service Requests ↗</a>
+              <span class="src-date">2020 – Present</span>
+            </div>
+            <p class="src-sub">Restaurant-Related Complaints</p>
+            <p class="src-fields">Fields Used: complaint type, complaint detail, incident address, borough, ZIP code, responding agency, open and close timestamps, status, and BBL</p>
+          </li>
+          <li>
+            <div class="src-head">
+              <a href="https://data.cityofnewyork.us/Health/DOHMH-New-York-City-Restaurant-Inspection-Results/43nn-pn8j" target="_blank" rel="noopener">DOHMH Restaurant Inspection Results ↗</a>
+              <span class="src-date">2023 – 2025</span>
+            </div>
+            <p class="src-sub">Health Inspection Records</p>
+            <p class="src-fields">Fields Used: restaurant name, cuisine type, inspection date, inspection type, violation code and description, criticality flag, score, grade, and BBL</p>
+          </li>
+        </ul>
       </div>
       <aside class="at-glance">
         <h4>At a glance</h4>
@@ -94,7 +115,7 @@
 <section class="case-section" id="model">
   <div class="wrap">
     <h2>The Dimensional Model</h2>
-    <p class="lede">A Kimball star schema with two marts — one for inspections, one for 311 complaints — sharing conformed dimensions. The sharing is the point: it's what makes cross-source analysis possible at all.</p>
+    <p class="lede">A Kimball star schema with two marts — one for inspections, one for 311 complaints — sharing conformed dimensions. The sharing is the point: it is what makes cross-source analysis possible at all.</p>
 
     <figure class="figure" style="margin-bottom:34px">
       <img src="projects/nyc-warehouse/dimensional_model.png" alt="Dimensional model showing fact_inspection and fact_service_request with shared dim_date and dim_location">
@@ -113,9 +134,9 @@
       </div>
     </div>
 
-    <h3 style="font-size:19px;font-weight:600;margin-bottom:10px">The BBL Problem</h3>
-    <p style="font-size:15px;color:var(--muted);line-height:1.75;max-width:760px;margin-bottom:12px">The obvious way to join these datasets is BBL — Borough, Block, Lot — the city's property identifier. It gives an exact, building-level match, which is what you want when asking whether <em>this specific restaurant</em> generated complaints before failing an inspection.</p>
-    <p style="font-size:15px;color:var(--muted);line-height:1.75;max-width:760px">In practice BBL was neither complete nor consistently formatted across both sources. Rather than accept the coverage loss, the model was designed to work at two levels: KPIs that need precision still join on BBL, while others fall back to the conformed location and date dimensions. That means partial BBL coverage degrades the analysis instead of breaking it — the central design decision in the whole model.</p>
+    <h3 style="font-size:19px;font-weight:600;margin-bottom:10px">How the Sources Connect</h3>
+    <p style="font-size:15px;color:var(--muted);line-height:1.75;max-width:760px;margin-bottom:12px">The two datasets share BBL — Borough, Block, Lot — the city's property identifier. Joining on BBL gives building-level precision, so a specific restaurant's complaints can be matched against its own inspection history. Several KPIs use it directly, including the severity impact and cuisine risk measures.</p>
+    <p style="font-size:15px;color:var(--muted);line-height:1.75;max-width:760px">The model also connects the two marts through the conformed <code>dim_location</code> and <code>dim_date</code> dimensions, which support analysis by borough, ZIP code, season, and year. Having two levels of join available means each KPI can be computed at whichever grain suits the question being asked.</p>
   </div>
 </section>
 
@@ -190,13 +211,24 @@
 <section class="case-section" id="kpis">
   <div class="wrap">
     <h2>Five Cross-Source KPIs</h2>
-    <p class="lede">Each of these requires both datasets. None can be computed from complaints or inspections alone — which is the argument for building the warehouse in the first place.</p>
+    <p class="lede">Each of these requires both datasets. None can be computed from complaints or inspections alone — which is the argument for building the warehouse in the first place. Switch to the SQL tab on any card to see how the measure was built.</p>
 
     <div class="kpi">
-      <p class="kpi-num">KPI 01 · Lead finding</p>
+      <p class="kpi-num">KPI 01</p>
       <h3>Inspection Targeting Effectiveness Index</h3>
-      <p class="q">Are inspectors actually going where the complaints are? The index averages three sub-metrics: what share of inspections happen in complaint-heavy areas, whether those areas get inspected at all, and whether inspection volume correlates with complaint volume.</p>
-      <pre><code>-- High-complaint BBLs = top 25% of complaint counts
+      <p class="q">Are inspectors going where the complaints are? The index averages three sub-metrics: what share of inspections happen in complaint-heavy areas, whether those areas get inspected at all, and whether inspection volume correlates with complaint volume.</p>
+
+      <div class="tabs" role="tablist">
+        <button class="tab-btn" role="tab" aria-selected="true">Chart</button>
+        <button class="tab-btn" role="tab" aria-selected="false">SQL</button>
+      </div>
+      <div class="tab-panel">
+        <figure class="figure">
+          <img src="projects/nyc-warehouse/kpi01_inspection_targeting.png" alt="Bar chart of inspection targeting effectiveness index by borough, ranging from about 0.23 to 0.33">
+        </figure>
+      </div>
+      <div class="tab-panel" hidden>
+<pre><code>-- High-complaint BBLs = top 25% of complaint counts
 threshold AS (
   SELECT APPROX_QUANTILES(complaint_count, 4)[OFFSET(3)] AS complaint_p75
   FROM combined
@@ -222,9 +254,8 @@ SELECT
   ( ... ) / 3 AS inspection_targeting_effectiveness_index
 FROM high_complaint_bbls
 GROUP BY borough</code></pre>
-      <figure class="figure" style="margin-bottom:18px">
-        <img src="projects/nyc-warehouse/kpi01_inspection_targeting.png" alt="Bar chart of inspection targeting effectiveness index by borough, ranging from about 0.23 to 0.33">
-      </figure>
+      </div>
+
       <div class="finding">
         <h4>Finding</h4>
         <p>The index lands between <strong>0.20 and 0.35 across all five boroughs</strong>, against an optimal value of 1.0. Manhattan is highest at 0.33; Staten Island lowest.</p>
@@ -235,8 +266,27 @@ GROUP BY borough</code></pre>
     <div class="kpi">
       <p class="kpi-num">KPI 02</p>
       <h3>Seasonal Complaint-Inspection Alignment</h3>
-      <p class="q">Do complaint spikes line up with worse inspection outcomes, and does that pattern move with the seasons?</p>
-      <pre><code>SELECT
+      <p class="q">Do complaint spikes line up with worse inspection outcomes, and does that pattern move with the seasons? The query produces two metrics — one for complaint pressure, one for inspection severity.</p>
+
+      <div class="tabs" role="tablist">
+        <button class="tab-btn" role="tab" aria-selected="true">Metric 1</button>
+        <button class="tab-btn" role="tab" aria-selected="false">Metric 2</button>
+        <button class="tab-btn" role="tab" aria-selected="false">SQL</button>
+      </div>
+      <div class="tab-panel">
+        <figure class="figure">
+          <img src="projects/nyc-warehouse/kpi02_complaint_inspection_ratio.png" alt="Line chart of complaint-to-inspection ratio by year and season, peaking in spring 2022">
+          <figcaption>Complaint-to-inspection ratio by year and season.</figcaption>
+        </figure>
+      </div>
+      <div class="tab-panel" hidden>
+        <figure class="figure">
+          <img src="projects/nyc-warehouse/kpi02_weighted_inspection_score.png" alt="Line chart of complaint-weighted inspection score by season and borough, Queens and Brooklyn highest">
+          <figcaption>Complaint-weighted inspection score by season and borough.</figcaption>
+        </figure>
+      </div>
+      <div class="tab-panel" hidden>
+<pre><code>SELECT
   sc.year, sc.season, sc.borough,
   sc.seasonal_complaints,
   si.seasonal_inspections,
@@ -257,16 +307,8 @@ LEFT JOIN seasonal_inspections si
  AND sc.season = si.season
  AND sc.borough = si.borough
 WHERE sc.year >= 2022 AND sc.year &lt; 2026</code></pre>
-      <div class="two-col" style="gap:20px;margin-bottom:18px">
-        <figure class="figure">
-          <img src="projects/nyc-warehouse/kpi02_complaint_inspection_ratio.png" alt="Line chart of complaint-to-inspection ratio by year and season, peaking in spring 2022">
-          <figcaption>Metric 1 — complaint-to-inspection ratio.</figcaption>
-        </figure>
-        <figure class="figure">
-          <img src="projects/nyc-warehouse/kpi02_weighted_inspection_score.png" alt="Line chart of complaint-weighted inspection score by season and borough, Queens and Brooklyn highest">
-          <figcaption>Metric 2 — complaint-weighted inspection score.</figcaption>
-        </figure>
       </div>
+
       <div class="finding">
         <h4>Finding</h4>
         <p>Complaint-to-inspection ratios peaked in <strong>2022, especially in spring</strong>, and are consistently lowest in winter. Summer and fall carry both higher complaint ratios and higher complaint-weighted inspection scores — warmer months are worse on both measures at once.</p>
@@ -278,7 +320,18 @@ WHERE sc.year >= 2022 AND sc.year &lt; 2026</code></pre>
       <p class="kpi-num">KPI 03</p>
       <h3>Cuisine Complaint Risk Index</h3>
       <p class="q">Which cuisine types combine high complaint activity with weak inspection performance? Complaints are tied to cuisine through the shared BBL field.</p>
-      <pre><code>SELECT
+
+      <div class="tabs" role="tablist">
+        <button class="tab-btn" role="tab" aria-selected="true">Chart</button>
+        <button class="tab-btn" role="tab" aria-selected="false">SQL</button>
+      </div>
+      <div class="tab-panel">
+        <figure class="figure">
+          <img src="projects/nyc-warehouse/kpi03_cuisine_risk.png" alt="Bar chart of cuisine complaint risk index by cuisine type, with American highest at about 130">
+        </figure>
+      </div>
+      <div class="tab-panel" hidden>
+<pre><code>SELECT
   cuisine_type,
   total_complaints,
   total_inspections,
@@ -297,9 +350,8 @@ WHERE sc.year >= 2022 AND sc.year &lt; 2026</code></pre>
 FROM combined
 WHERE total_inspections >= 10   -- drop thin cuisine categories
 ORDER BY cuisine_complaint_risk_index DESC</code></pre>
-      <figure class="figure" style="margin-bottom:18px">
-        <img src="projects/nyc-warehouse/kpi03_cuisine_risk.png" alt="Bar chart of cuisine complaint risk index by cuisine type, with American highest at about 130">
-      </figure>
+      </div>
+
       <div class="finding">
         <h4>Finding</h4>
         <p><strong>American cuisine tops the index at roughly 130</strong> — close to four times the next category. High complaint volume alongside higher violation penalty points.</p>
@@ -311,7 +363,18 @@ ORDER BY cuisine_complaint_risk_index DESC</code></pre>
       <p class="kpi-num">KPI 04</p>
       <h3>Complaint Severity Inspection Impact</h3>
       <p class="q">Do <em>severe</em> complaints predict worse inspections? The 311 data has no severity field, so severity was derived from keywords — food, sanitation, dirty, vermin, rodent — across the problem and problem-detail fields.</p>
-      <pre><code>-- No severity field exists in 311, so define it by keyword
+
+      <div class="tabs" role="tablist">
+        <button class="tab-btn" role="tab" aria-selected="true">Chart</button>
+        <button class="tab-btn" role="tab" aria-selected="false">SQL</button>
+      </div>
+      <div class="tab-panel">
+        <figure class="figure">
+          <img src="projects/nyc-warehouse/kpi04_severity_impact.png" alt="Line chart of complaint severity impact by month across 2022 to 2025, with peaks in January, July, and December">
+        </figure>
+      </div>
+      <div class="tab-panel" hidden>
+<pre><code>-- No severity field exists in 311, so define it by keyword
 WHERE sr.bbl IS NOT NULL
   AND d.year BETWEEN 2022 AND 2025
   AND (
@@ -332,13 +395,12 @@ SAFE_DIVIDE(
     COUNT(DISTINCT CASE WHEN severe_complaint_count > 0 THEN bbl END),
     COUNT(DISTINCT bbl))
 ) AS severity_impact_score</code></pre>
-      <figure class="figure" style="margin-bottom:18px">
-        <img src="projects/nyc-warehouse/kpi04_severity_impact.png" alt="Line chart of complaint severity impact by month across 2022 to 2025, with peaks in January, July, and December">
-      </figure>
+      </div>
+
       <div class="finding">
         <h4>Finding</h4>
         <p>Months with higher severity impact scores were generally associated with worse inspection outcomes, with peaks in <strong>January, July, and December</strong>.</p>
-        <p>The honest caveat: severity here is a keyword proxy, not a field the city publishes. It's a defensible construction, but it's a construction — and a different keyword set would produce different numbers.</p>
+        <p>The honest caveat: severity here is a keyword proxy, not a field the city publishes. It is a defensible construction, but it is a construction — and a different keyword set would produce different numbers.</p>
       </div>
     </div>
 
@@ -346,7 +408,18 @@ SAFE_DIVIDE(
       <p class="kpi-num">KPI 05</p>
       <h3>Complaint Adjusted Inspection Risk</h3>
       <p class="q">At the location level, do areas with more complaints per inspection also carry worse average inspection scores?</p>
-      <pre><code>SELECT
+
+      <div class="tabs" role="tablist">
+        <button class="tab-btn" role="tab" aria-selected="true">Chart</button>
+        <button class="tab-btn" role="tab" aria-selected="false">SQL</button>
+      </div>
+      <div class="tab-panel">
+        <figure class="figure">
+          <img src="projects/nyc-warehouse/kpi05_high_complaint_bbls.png" alt="Bar chart of high-complaint BBLs and inspections in high-complaint areas by borough, Manhattan highest">
+        </figure>
+      </div>
+      <div class="tab-panel" hidden>
+<pre><code>SELECT
   l.borough,
   COUNT(DISTINCT c.location_key) AS total_locations,
   SUM(c.total_complaints)        AS total_complaints,
@@ -365,9 +438,8 @@ FROM combined c
 INNER JOIN dim_location l ON c.location_key = l.location_key
 GROUP BY l.borough
 ORDER BY complaint_adjusted_inspection_risk DESC</code></pre>
-      <figure class="figure" style="margin-bottom:18px">
-        <img src="projects/nyc-warehouse/kpi05_high_complaint_bbls.png" alt="Bar chart of high-complaint BBLs and inspections in high-complaint areas by borough, Manhattan highest">
-      </figure>
+      </div>
+
       <div class="finding">
         <h4>Finding</h4>
         <p>Complaint density and poor inspection outcomes do move together at borough level. <strong>Manhattan recorded over 2,500 high-complaint BBLs and Brooklyn roughly 2,000</strong> — the two densest boroughs concentrate both public complaints and enforcement activity.</p>
@@ -377,29 +449,14 @@ ORDER BY complaint_adjusted_inspection_risk DESC</code></pre>
   </div>
 </section>
 
-<section class="case-section" id="conclusions">
+<section class="case-section" id="conclusion">
   <div class="wrap">
-    <h2>Conclusions &amp; Next Steps</h2>
-    <p class="lede">Joining the two sources produced findings neither could support alone.</p>
-
-    <div class="two-col" style="margin-bottom:30px">
-      <div>
-        <h3>What the analysis supports</h3>
-        <p>Complaint data is a usable signal for inspection planning. Complaint activity and poor inspection outcomes align by cuisine, by borough, and by season — and current inspection targeting captures very little of that signal.</p>
-        <p style="margin-top:12px">For stakeholders planning 2026 inspections, the practical implication is that 311 volume should be an input to deployment decisions rather than a parallel record nobody consults.</p>
-      </div>
-      <div>
-        <h3>Where it falls short</h3>
-        <p>BBL coverage limited property-level matching, so much of the analysis runs at borough granularity — coarser than it should be for operational decisions. Complaint severity is a keyword proxy rather than a published field.</p>
-      </div>
+    <h2>Conclusion</h2>
+    <div class="prose">
+      <p>The analysis found consistent overlap between restaurant complaints and inspection outcomes across cuisine type, location, and time of year. Complaint-to-inspection ratios were highest in 2022 and remained elevated through the warmer months, when inspection scores also worsened. Queens and Brooklyn recorded the highest complaint-weighted inspection scores, and American cuisine ranked highest on the cuisine complaint risk index.</p>
+      <p>Despite these patterns, inspection activity does not appear to follow them. The inspection targeting effectiveness index ranged from 0.20 to 0.35 across the five boroughs, well below the optimal value of 1.0, indicating that inspections are not concentrated in the areas generating the most complaints. This suggests that 311 service requests could serve as a useful input when planning where inspections are deployed.</p>
+      <p>Two limitations should be noted. The analysis was conducted at the borough level, which is broader than the area an inspector actually covers, and complaint severity was derived from keyword matching rather than from a published severity field.</p>
     </div>
-
-    <h3 style="font-size:19px;font-weight:600;margin-bottom:12px">Next steps</h3>
-    <ul class="tl-bullets" style="max-width:760px">
-      <li><strong>Narrow location analysis to ZIP code.</strong> Borough is too coarse to route an inspector. ZIP-level grouping would make the targeting index actionable rather than diagnostic.</li>
-      <li><strong>Measure the lag between severe complaints and poor inspection scores.</strong> The current analysis shows the two co-occur; it doesn't establish whether complaints <em>lead</em> inspections. That's the question that would turn this from a description into a prediction.</li>
-      <li><strong>Improve BBL coverage</strong> through address standardization or geocoding, which would restore property-level matching and sharpen every KPI that currently falls back to location.</li>
-    </ul>
   </div>
 </section>
 
@@ -437,6 +494,19 @@ ORDER BY complaint_adjusted_inspection_risk DESC</code></pre>
 <script>
   document.getElementById('navToggle').addEventListener('click', function () {
     document.getElementById('navLinks').classList.toggle('open');
+  });
+
+  document.querySelectorAll('.tabs').forEach(function (tabs) {
+    var btns = tabs.querySelectorAll('.tab-btn');
+    var panels = tabs.parentElement.querySelectorAll('.tab-panel');
+    btns.forEach(function (btn, i) {
+      btn.addEventListener('click', function () {
+        btns.forEach(function (b) { b.setAttribute('aria-selected', 'false'); });
+        panels.forEach(function (p) { p.hidden = true; });
+        btn.setAttribute('aria-selected', 'true');
+        if (panels[i]) { panels[i].hidden = false; }
+      });
+    });
   });
 </script>
 
