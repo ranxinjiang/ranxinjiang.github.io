@@ -97,7 +97,7 @@
     <p class="lede">A Kimball star schema with two marts — one for inspections, one for 311 complaints — sharing conformed dimensions. The sharing is the point: it's what makes cross-source analysis possible at all.</p>
 
     <figure class="figure" style="margin-bottom:34px">
-      <img src="projects/nyc-warehouse/dimensional-model.png" alt="Dimensional model showing fact_inspection and fact_service_request with shared dim_date and dim_location">
+      <img src="projects/nyc-warehouse/dimensional_model.png" alt="Dimensional model showing fact_inspection and fact_service_request with shared dim_date and dim_location">
       <figcaption>Final dimensional model — two fact tables, ten dimensions, conformed on date and location.</figcaption>
     </figure>
 
@@ -181,7 +181,7 @@
     </div>
 
     <figure class="figure">
-      <img src="projects/nyc-warehouse/dbt-dag-lineage.png" alt="dbt lineage graph showing two sources flowing through staging models into ten dimensions and two fact tables">
+      <img src="projects/nyc-warehouse/dbt_dag_lineage.png" alt="dbt lineage graph showing two sources flowing through staging models into ten dimensions and two fact tables">
       <figcaption>dbt lineage — two sources, two staging models, ten dimensions, two facts.</figcaption>
     </figure>
   </div>
@@ -222,6 +222,9 @@ SELECT
   ( ... ) / 3 AS inspection_targeting_effectiveness_index
 FROM high_complaint_bbls
 GROUP BY borough</code></pre>
+      <figure class="figure" style="margin-bottom:18px">
+        <img src="projects/nyc-warehouse/kpi01_inspection_targeting.png" alt="Bar chart of inspection targeting effectiveness index by borough, ranging from about 0.23 to 0.33">
+      </figure>
       <div class="finding">
         <h4>Finding</h4>
         <p>The index lands between <strong>0.20 and 0.35 across all five boroughs</strong>, against an optimal value of 1.0. Manhattan is highest at 0.33; Staten Island lowest.</p>
@@ -254,6 +257,16 @@ LEFT JOIN seasonal_inspections si
  AND sc.season = si.season
  AND sc.borough = si.borough
 WHERE sc.year >= 2022 AND sc.year &lt; 2026</code></pre>
+      <div class="two-col" style="gap:20px;margin-bottom:18px">
+        <figure class="figure">
+          <img src="projects/nyc-warehouse/kpi02_complaint_inspection_ratio.png" alt="Line chart of complaint-to-inspection ratio by year and season, peaking in spring 2022">
+          <figcaption>Metric 1 — complaint-to-inspection ratio.</figcaption>
+        </figure>
+        <figure class="figure">
+          <img src="projects/nyc-warehouse/kpi02_weighted_inspection_score.png" alt="Line chart of complaint-weighted inspection score by season and borough, Queens and Brooklyn highest">
+          <figcaption>Metric 2 — complaint-weighted inspection score.</figcaption>
+        </figure>
+      </div>
       <div class="finding">
         <h4>Finding</h4>
         <p>Complaint-to-inspection ratios peaked in <strong>2022, especially in spring</strong>, and are consistently lowest in winter. Summer and fall carry both higher complaint ratios and higher complaint-weighted inspection scores — warmer months are worse on both measures at once.</p>
@@ -284,6 +297,9 @@ WHERE sc.year >= 2022 AND sc.year &lt; 2026</code></pre>
 FROM combined
 WHERE total_inspections >= 10   -- drop thin cuisine categories
 ORDER BY cuisine_complaint_risk_index DESC</code></pre>
+      <figure class="figure" style="margin-bottom:18px">
+        <img src="projects/nyc-warehouse/kpi03_cuisine_risk.png" alt="Bar chart of cuisine complaint risk index by cuisine type, with American highest at about 130">
+      </figure>
       <div class="finding">
         <h4>Finding</h4>
         <p><strong>American cuisine tops the index at roughly 130</strong> — close to four times the next category. High complaint volume alongside higher violation penalty points.</p>
@@ -316,6 +332,9 @@ SAFE_DIVIDE(
     COUNT(DISTINCT CASE WHEN severe_complaint_count > 0 THEN bbl END),
     COUNT(DISTINCT bbl))
 ) AS severity_impact_score</code></pre>
+      <figure class="figure" style="margin-bottom:18px">
+        <img src="projects/nyc-warehouse/kpi04_severity_impact.png" alt="Line chart of complaint severity impact by month across 2022 to 2025, with peaks in January, July, and December">
+      </figure>
       <div class="finding">
         <h4>Finding</h4>
         <p>Months with higher severity impact scores were generally associated with worse inspection outcomes, with peaks in <strong>January, July, and December</strong>.</p>
@@ -346,6 +365,9 @@ FROM combined c
 INNER JOIN dim_location l ON c.location_key = l.location_key
 GROUP BY l.borough
 ORDER BY complaint_adjusted_inspection_risk DESC</code></pre>
+      <figure class="figure" style="margin-bottom:18px">
+        <img src="projects/nyc-warehouse/kpi05_high_complaint_bbls.png" alt="Bar chart of high-complaint BBLs and inspections in high-complaint areas by borough, Manhattan highest">
+      </figure>
       <div class="finding">
         <h4>Finding</h4>
         <p>Complaint density and poor inspection outcomes do move together at borough level. <strong>Manhattan recorded over 2,500 high-complaint BBLs and Brooklyn roughly 2,000</strong> — the two densest boroughs concentrate both public complaints and enforcement activity.</p>
