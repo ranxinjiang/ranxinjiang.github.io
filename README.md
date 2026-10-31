@@ -22,6 +22,7 @@ Hand-built with HTML, CSS, and JavaScript. No framework, no build step. Hosted o
 ├── projects.html                   Projects index
 ├── certifications.html             Certifications
 │
+├── project-aapl-stock.html         Case study — AAPL stock performance analysis
 ├── project-nyc-warehouse.html      Case study — NYC restaurant data warehouse
 ├── project-aws-pipeline.html       Case study — AWS streaming pipeline
 ├── project-buffalo-flights.html    Case study — Buffalo flight delay analysis
@@ -32,6 +33,7 @@ Hand-built with HTML, CSS, and JavaScript. No framework, no build step. Hosted o
 ├── img/                            Site imagery
 ├── certs/                          Certificate PDFs
 ├── projects/                       Per-project images and downloads
+│   ├── aapl-stock/
 │   ├── nyc-warehouse/
 │   ├── aws-pipeline/
 │   ├── buffalo-flights/
@@ -45,6 +47,7 @@ Pages live at the root; every asset belonging to a project lives in that project
 
 | Repository | Contents |
 |---|---|
+| [AAPL-Stock-Performance-Analysis](https://github.com/ranxinjiang/AAPL-Stock-Performance-Analysis) | Colab notebook, written report, and one year of daily AAPL price data |
 | [NYC-Restaurant-Analytics-Warehouse](https://github.com/ranxinjiang/NYC-Restaurant-Analytics-Warehouse) | Dimensional model, dbt lineage, and the five KPI queries |
 | [AWS-Streaming-Finance-Pipeline](https://github.com/ranxinjiang/AWS-Streaming-Finance-Pipeline) | Lambda producer, Athena query, and analysis notebook |
 | [Flight-Data-Analysis-from-Buffalo-NY-Airport](https://github.com/ranxinjiang/Flight-Data-Analysis-from-Buffalo-NY-Airport) | Jupyter notebook and 30 days of raw JSON flight records |
